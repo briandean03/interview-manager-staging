@@ -77,7 +77,7 @@ const CandidateSearchModal: React.FC<CandidateSearchModalProps> = ({ isOpen, onC
       return
     }
     // Replace this with your actual folder viewer URL
-    const baseUrl = 'www.youtube.com'
+    const baseUrl = 'www.example.com'
     window.open(`${baseUrl}${folderId}`, '_blank')
   }
 
