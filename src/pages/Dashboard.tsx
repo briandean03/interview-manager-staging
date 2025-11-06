@@ -7,7 +7,6 @@ import AppointmentForm from '../components/AppointmentForm'
 import CandidateSearchModal from '../components/CandidateSearchModal'
 
 
-const [showCandidateSearch, setShowCandidateSearch] = useState(false)
 
 
 interface DashboardStats {
@@ -27,6 +26,9 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [showAppointmentForm, setShowAppointmentForm] = useState(false)
   const [selectedDate, setSelectedDate] = useState(new Date())
+
+  const [showCandidateSearch, setShowCandidateSearch] = useState(false)
+
 
   useEffect(() => {
     fetchDashboardStats()
