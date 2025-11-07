@@ -324,19 +324,25 @@ const InterviewProgress: React.FC = () => {
                 {groupedLogs.map((group) => (
                   <div key={group.candidate_id} className="border border-gray-200 rounded-lg overflow-hidden">
                     {/* Group Header */}
-                    <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <div className="bg-gray-50 px-4 sm:px-6 py-4 border-b border-gray-200">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                        {/* Left side: candidate info */}
+                        <div className="flex items-center space-x-3 min-w-0">
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex-shrink-0 flex items-center justify-center">
                             <User className="w-5 h-5 text-blue-600" />
                           </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-gray-900">{group.candidate_name}</h3>
-                            <p className="text-sm text-gray-600">
+                          <div className="min-w-0">
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+                              {group.candidate_name}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-gray-600">
                               {group.interview_date ? (
-                                <span className="flex items-center space-x-1">
-                                  <Calendar className="w-4 h-4" />
-                                  <span>Interview: {format(parseISO(group.interview_date), 'MMM d, yyyy - HH:mm')}</span>
+                                <span className="flex flex-wrap items-center space-x-1 text-gray-700">
+                                  <Calendar className="w-4 h-4 flex-shrink-0" />
+                                  <span className="truncate">
+                                    Interview:&nbsp;
+                                    {format(parseISO(group.interview_date), 'MMM d, yyyy - HH:mm')}
+                                  </span>
                                 </span>
                               ) : (
                                 'No interview scheduled'
@@ -344,53 +350,68 @@ const InterviewProgress: React.FC = () => {
                             </p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="text-sm font-medium text-gray-900">{group.logs.length} activities</div>
-                          <div className="text-xs text-gray-500">
+
+                        {/* Right side: activity info */}
+                        <div className="flex sm:flex-col items-start sm:items-end justify-between sm:justify-end gap-1 sm:gap-0 text-xs sm:text-sm text-gray-700">
+                          <div className="font-medium text-gray-900">{group.logs.length} activities</div>
+                          <div className="text-gray-500">
                             Latest: {format(parseISO(group.logs[0].created_at), 'MMM d, HH:mm')}
                           </div>
                         </div>
                       </div>
                     </div>
 
+
                     {/* Group Activities */}
                     <div className="divide-y divide-gray-200">
                       {group.logs.map((log, index) => (
                         <div key={log.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
-                          <div className="flex items-start space-x-4">
+                          <div className="flex items-start gap-3 sm:gap-4 flex-wrap">
+                            {/* Left Icon */}
                             <div className="flex-shrink-0 mt-1">
                               {getStatusIcon(log.current_status)}
                             </div>
+
+                            {/* Right content */}
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center space-x-3">
-                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(log.current_status)}`}>
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-2">
+                                
+                                {/* Status badges */}
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span
+                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(log.current_status)}`}
+                                  >
                                     {log.current_status || 'Unknown Status'}
                                   </span>
                                   {index === 0 && (
-                                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                                    <span className="px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full whitespace-nowrap">
                                       Latest
                                     </span>
                                   )}
                                 </div>
-                                <div className="flex items-center space-x-4 text-sm text-gray-500">
+
+                                {/* Date & Time */}
+                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-gray-500">
                                   <div className="flex items-center space-x-1">
-                                    <Calendar className="w-4 h-4" />
+                                    <Calendar className="w-4 h-4 flex-shrink-0" />
                                     <span>{format(parseISO(log.created_at), 'MMM d, yyyy')}</span>
                                   </div>
                                   <div className="flex items-center space-x-1">
-                                    <Clock className="w-4 h-4" />
-                                    <span>{format(parseISO(log.created_at), 'HH:mm:ss')}</span>
+                                    <Clock className="w-4 h-4 flex-shrink-0" />
+                                    <span>{format(parseISO(log.created_at), 'HH:mm')}</span>
                                   </div>
                                 </div>
                               </div>
+
+                              {/* Optional Execution ID */}
                               {log.execution_id && (
-                                <p className="text-sm text-gray-600">
+                                <p className="text-xs sm:text-sm text-gray-600 break-all">
                                   Execution ID: {log.execution_id}
                                 </p>
                               )}
                             </div>
                           </div>
+
                         </div>
                       ))}
                     </div>

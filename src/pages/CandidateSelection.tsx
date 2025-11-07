@@ -399,9 +399,10 @@ To fix this:
     )
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    return (
+      <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+        <div className="mx-auto w-full max-w-screen-xl px-3 sm:px-5 md:px-8 py-4 sm:py-6">
+
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-6">
@@ -466,9 +467,9 @@ To fix this:
         </div>
 
         {/* Two Panel Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left Panel - Candidate Gallery */}
-          <div className="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-[calc(100vh-300px)]">
+          <div className="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col max-h-[75vh]">
             <div className="p-4 border-b border-gray-200 flex-shrink-0">
               <h3 className="text-lg font-semibold text-gray-900">Candidates</h3>
               <p className="text-sm text-gray-500">{filteredCandidates.length} candidates</p>
@@ -526,49 +527,62 @@ To fix this:
           </div>
 
           {/* Right Panel - Candidate Details */}
-          <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-[calc(100vh-300px)]">
+          <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col max-h-[75vh]">
             {selectedCandidate ? (
               <>
                 {/* Header */}
                 <div className="p-6 border-b border-gray-200 flex-shrink-0">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                        <User className="h-8 w-8 text-blue-600" />
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                    {/* Left side: candidate name */}
+                    <div className="flex items-center space-x-3 min-w-0">
+                      <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <User className="h-7 w-7 text-blue-600" />
                       </div>
-                      <div>
-                        <h2 className="text-2xl font-bold text-gray-900">
+                      <div className="min-w-0">
+                        <h2 className="text-lg sm:text-2xl font-bold text-gray-900 truncate">
                           {getCandidateName(selectedCandidate)}
                         </h2>
-                        <p className="text-gray-600">{selectedCandidate.position_code || 'No position specified'}</p>
+                        <p className="text-sm text-gray-600 truncate">
+                          {selectedCandidate.position_code || 'No position specified'}
+                        </p>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-3">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(selectedCandidate.status)}`}>
+
+                    {/* Right side: status + buttons */}
+                    <div className="flex flex-wrap items-center justify-start sm:justify-end gap-2">
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs sm:text-sm font-medium border ${getStatusColor(selectedCandidate.status)}`}
+                      >
                         {selectedCandidate.status}
                       </span>
+
                       {selectedCandidate.vote !== null && selectedCandidate.vote !== undefined && (
-                        <div className="flex items-center space-x-2">
-                          <Award className="h-5 w-5 text-yellow-600" />
-                  <button
-                    onClick={handleScheduleInterview}
-                    className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                  >
-                    <Calendar className="h-4 w-4" />
-                    <span>Schedule Interview</span>
-                  </button>
-                          <span className="text-lg font-semibold text-gray-900">
-                            {typeof selectedCandidate.vote === 'number' ? selectedCandidate.vote.toFixed(1) : selectedCandidate.vote}
-                          </span>
-                        </div>
+                        <>
+                          <button
+                            onClick={handleScheduleInterview}
+                            className="flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs sm:text-sm"
+                          >
+                            <Calendar className="h-4 w-4" />
+                            <span>Schedule</span>
+                          </button>
+                          <div className="flex items-center space-x-1 text-sm font-semibold text-gray-900">
+                            <Award className="h-4 w-4 text-yellow-600" />
+                            <span>
+                              {typeof selectedCandidate.vote === 'number'
+                                ? selectedCandidate.vote.toFixed(1)
+                                : selectedCandidate.vote}
+                            </span>
+                          </div>
+                        </>
                       )}
                     </div>
                   </div>
+
                 </div>
 
                 {/* Details Content */}
                 <div className="flex-1 overflow-y-auto p-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     {/* Contact Information */}
                     <div className="space-y-6">
                       <div>
