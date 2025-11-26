@@ -10,6 +10,8 @@ import QuickActions from '../components/QuickActions'
 import AppointmentCalendar from '../components/AppointmentCalendar'
 import AppointmentForm from '../components/AppointmentForm'
 import CandidateSearchModal from '../components/CandidateSearchModal'
+import { Candidate } from "../lib/Candidate"
+
 
 interface DashboardStats {
   totalCandidates: number
@@ -35,46 +37,71 @@ const Dashboard: React.FC = () => {
   }, [])
 
   const fetchDashboardStats = async () => {
-    try {
-      const { data: candidates, error: candidatesError } = await supabase
-        .from('hrta_cd00-01_resume_extraction')
-        .select('candidate_id, status')
+  try {
+    // 1. Total candidates
+    const { data: candidates } = await supabase
+      .from("hrta_cd00-01_resume_extraction")
+      .select("candidate_id, status")
 
-      if (candidatesError) throw candidatesError
+    const totalCandidates = candidates?.length || 0
 
-      const { data: appointments, error: appointmentsError } = await supabase
-        .from('hrta_cd00-03_appointment_info')
-        .select('id, candidate_id')
+    // 2. Completed Interviews
+    const completedInterviews =
+      candidates?.filter(c => c.status === "Interviewed").length || 0
 
-      if (appointmentsError) throw appointmentsError
+    // 3. Scheduled Interviews (upcoming only)
+    const { data: upcoming } = await supabase
+      .from("hrta_cd00-03_appointment_info")
+      .select("candidate_id, appointment_time")
+      .not("appointment_time", "is", null)
 
-      const { data: evaluations, error: evaluationsError } = await supabase
-        .from('hrta_sd00-03_ai_evaluations')
-        .select('candidate_id')
+      // Filter by future only
+    const futureAppointments = (upcoming || []).filter(x =>
+      x.appointment_time && new Date(x.appointment_time) > new Date()
+    )
+    // Fetch candidate statuses
+    const { data: resumeRows } = await supabase
+      .from("hrta_cd00-01_resume_extraction")
+      .select("candidate_id, status")
+      .in("candidate_id", futureAppointments.map(a => a.candidate_id))
 
-      if (evaluationsError) throw evaluationsError
+    // Build map
+    const statusMap = new Map(
+      resumeRows?.map(r => [r.candidate_id, r.status]) || []
+    )
 
-      const totalCandidates = candidates?.length || 0
-      const scheduledInterviews = appointments?.length || 0
-      const completedInterviews =
-        candidates?.filter((c) => c.status === 'Interviewed').length || 0
-      const evaluatedCandidates = new Set(
-        evaluations?.map((e) => e.candidate_id) || []
-      ).size
-      const pendingEvaluations = Math.max(0, completedInterviews - evaluatedCandidates)
+    // Count only NOT interviewed
+    const scheduledInterviews = futureAppointments.filter(a =>
+      statusMap.get(a.candidate_id) !== "Interviewed"
+    ).length
 
-      setStats({
-        totalCandidates,
-        scheduledInterviews,
-        completedInterviews,
-        pendingEvaluations,
-      })
-    } catch (error) {
-      console.error('Error fetching dashboard stats:', error)
-    } finally {
-      setLoading(false)
-    }
+
+    
+
+    // 4. Pending evaluations
+    const { data: evaluations } = await supabase
+      .from("hrta_sd00-03_ai_evaluations")
+      .select("candidate_id")
+
+    const evaluatedSet = new Set(evaluations?.map(e => e.candidate_id) || [])
+    const pendingEvaluations = Math.max(0, completedInterviews - evaluatedSet.size)
+
+    // Update dashboard
+    setStats({
+      totalCandidates,
+      scheduledInterviews,
+      completedInterviews,
+      pendingEvaluations,
+    })
+
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error)
+  } finally {
+    setLoading(false)
   }
+}
+
+
 
   const handleNewAppointment = () => setShowAppointmentForm(true)
   const handleAppointmentSuccess = () => {

@@ -2,34 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { getSupabaseClient, isSupabaseConfigured, resetSupabaseConnection } from '../lib/supabase'
 import { Search, ListFilter as Filter, ChevronDown, Users, Save, X, CreditCard as Edit3, RefreshCw, User, Mail, Phone, MapPin, Calendar, Award, Briefcase, Globe, Car, Languages, GraduationCap, Clock, DollarSign, ChevronRight, Plus } from 'lucide-react'
 import AppointmentForm from '../components/AppointmentForm'
+import { Candidate } from "../lib/Candidate"
 
-interface Candidate {
-  candidate_id: string
-  first_name: string
-  last_name: string
-  email: string
-  mobile_num?: string
-  status: string
-  years_experience?: string
-  position_code?: string
-  availability?: string
-  asking_salary?: string
-  visa_status?: string
-  skills?: string
-  education_qaulifiation?: string
-  experience?: string
-  honors_and_awards?: string
-  languages?: string
-  driving_license?: string
-  nationality?: string
-  qualifications?: string
-  ai_evaluation?: string
-  vote?: number
-  application_date?: string
-  created_at: string
-  date_interviewed?: string // 🆕 add this line
-
-}
 
 const CandidateSelection: React.FC = () => {
   // Remove console.log to prevent constant logging
