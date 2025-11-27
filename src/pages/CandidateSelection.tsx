@@ -9,7 +9,7 @@ const CandidateSelection: React.FC = () => {
   // Remove console.log to prevent constant logging
   
   // State declarations - no duplicates
-  const [candidates, setCandidates] = useState<Candidate[]>([])
+  const [candidates, setCandidates] = useState<Candidate[]>([]) 
   const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null)
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -24,6 +24,8 @@ const CandidateSelection: React.FC = () => {
   const [positions, setPositions] = useState<{ code: string; name: string }[]>([]);
   const [cvUrl, setCvUrl] = useState<string | null>(null);
   const [showCvModal, setShowCvModal] = useState(false);
+
+  // Mapping for created filter labels
   const createdFilterLabels: Record<string, string> = {
   today: "Today",
   "7days": "Last 7 Days",
@@ -32,12 +34,6 @@ const CandidateSelection: React.FC = () => {
   lastmonth: "Last Month",
 };
 
-
-
-
-
-
-  
   // Appointment form state
   const [showAppointmentForm, setShowAppointmentForm] = useState(false)
   
@@ -835,7 +831,7 @@ const uniqueStatuses = React.useMemo(() => {
                         <User className="h-7 w-7 text-blue-600" />
                       </div>
                       <div className="min-w-0">
-                        <h2 className="text-lg sm:text-2xl font-bold text-gray-900 truncate">
+                        <h2 className="text-lg sm:text-2xl font-bold text-gray-900 leading-tight line-clamp-2">
                           {getCandidateName(selectedCandidate)}
                         </h2>
                         <p className="text-sm text-gray-600 truncate">
