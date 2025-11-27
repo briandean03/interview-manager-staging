@@ -22,6 +22,19 @@ const CandidateSelection: React.FC = () => {
   const [connectionStatus, setConnectionStatus] = useState<'checking' | 'connected' | 'failed'>('checking')
   const [createdFilter, setCreatedFilter] = useState<string>('all')
   const [positions, setPositions] = useState<{ code: string; name: string }[]>([]);
+  const [cvUrl, setCvUrl] = useState<string | null>(null);
+  const [showCvModal, setShowCvModal] = useState(false);
+  const createdFilterLabels: Record<string, string> = {
+  today: "Today",
+  "7days": "Last 7 Days",
+  "30days": "Last 30 Days",
+  thismonth: "This Month",
+  lastmonth: "Last Month",
+};
+
+
+
+
 
 
   
@@ -204,6 +217,35 @@ To fix this:
     hasInitializedRef.current = true
     await fetchCandidates()
   }, [fetchCandidates])
+
+    const getCvPreviewUrl = (url: string | null) => {
+    if (!url) return null;
+
+    // If Google Drive link → convert to preview link
+    if (url.includes("drive.google.com")) {
+      const match = url.match(/\/d\/(.*?)\//);
+      if (match && match[1]) {
+        const fileId = match[1];
+        return `https://drive.google.com/file/d/${fileId}/preview`;
+      }
+    }
+
+    // For SharePoint or any direct PDF → use as is
+    return url;
+  };
+
+useEffect(() => {
+  if (selectedCandidate?.cv_filename) {
+    const previewUrl = getCvPreviewUrl(selectedCandidate.cv_filename);
+    setCvUrl(previewUrl);
+  } else {
+    setCvUrl(null);
+  }
+}, [selectedCandidate]);
+
+
+
+
 
   const handleResetConnection = useCallback(async () => {
     hasInitializedRef.current = false
@@ -488,6 +530,49 @@ const uniqueStatuses = React.useMemo(() => {
     )
   }
 
+  const EditableField = ({
+  label,
+  field,
+  value,
+  type = "text"
+}: {
+  label: string;
+  field: string;
+  value: any;
+  type?: string;
+}) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+
+    {editingField === field ? (
+      <div className="flex items-center space-x-2">
+        <input
+          type={type}
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          autoFocus
+        />
+        <button onClick={saveEdit} disabled={saving} className="p-2 text-green-600 hover:bg-green-50 rounded">
+          <Save className="h-4 w-4" />
+        </button>
+        <button onClick={cancelEdit} className="p-2 text-red-600 hover:bg-red-50 rounded">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    ) : (
+      <div
+        onClick={() => startEdit(field, value)}
+        className="group cursor-pointer  rounded-lg p-3 border border-gray-200 relative"
+      >
+        <div className="text-sm text-gray-900">{value || "Not provided"}</div>
+        <Edit3 className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 absolute top-3 right-3" />
+      </div>
+    )}
+  </div>
+);
+
+
     return (
       <div className="min-h-screen bg-gray-50 overflow-x-hidden">
         <div className="mx-auto w-full max-w-screen-xl px-3 sm:px-5 md:px-8 py-4 sm:py-6">
@@ -564,6 +649,110 @@ const uniqueStatuses = React.useMemo(() => {
             <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
 
+          {/* Active Filters — Linear Style */}
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+
+              {/* Helper function style */}
+              {searchTerm && (
+                <div className="
+                  flex items-center gap-2 px-3 py-1.5 
+                  rounded-xl border border-gray-300 bg-white shadow-sm
+                  text-xs font-medium text-gray-700
+                ">
+                  <span className="opacity-80">Search:</span>
+                  <span className="font-semibold text-gray-900">{searchTerm}</span>
+
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="text-gray-400 hover:text-gray-600 transition"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              {statusFilter !== "all" && (
+                <div className="
+                  flex items-center gap-2 px-3 py-1.5 
+                  rounded-xl border border-gray-300 bg-white shadow-sm
+                  text-xs font-medium text-gray-700
+                ">
+                  <span className="opacity-80">Status:</span>
+                  <span className="font-semibold text-gray-900">{statusFilter}</span>
+
+                  <button
+                    onClick={() => setStatusFilter('all')}
+                    className="text-gray-400 hover:text-gray-600 transition"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              {positionFilter !== "all" && (
+                <div className="
+                  flex items-center gap-2 px-3 py-1.5 
+                  rounded-xl border border-gray-300 bg-white shadow-sm
+                  text-xs font-medium text-gray-700
+                ">
+                  <span className="opacity-80">Position:</span>
+                  <span className="font-semibold text-gray-900">
+                    {positions.find((p) => p.code === positionFilter)?.name || positionFilter}
+                  </span>
+
+
+                  <button
+                    onClick={() => setPositionFilter('all')}
+                    className="text-gray-400 hover:text-gray-600 transition"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              {createdFilter !== "all" && (
+                <div className="
+                  flex items-center gap-2 px-3 py-1.5 
+                  rounded-xl border border-gray-300 bg-white shadow-sm
+                  text-xs font-medium text-gray-700
+                ">
+                  <span className="opacity-80">Date:</span>
+                  <span className="font-semibold text-gray-900">
+                    {createdFilterLabels[createdFilter] || createdFilter}
+                  </span>
+
+
+                  <button
+                    onClick={() => setCreatedFilter('all')}
+                    className="text-gray-400 hover:text-gray-600 transition"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              {/* CLEAR ALL — Linear minimal button */}
+              {(searchTerm || statusFilter !== "all" || positionFilter !== "all" || createdFilter !== "all") && (
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setStatusFilter('all');
+                    setPositionFilter('all');
+                    setCreatedFilter('all');
+                  }}
+                  className="
+                    ml-1 px-3 py-1.5 rounded-xl border border-transparent
+                    text-xs font-medium text-gray-500 hover:text-gray-700
+                    hover:bg-gray-100 transition
+                  "
+                >
+                  Clear All
+                </button>
+              )}
+
+            </div>
+
+
             
             <div className="mt-4">
               <p className="text-gray-600">
@@ -592,7 +781,7 @@ const uniqueStatuses = React.useMemo(() => {
                       className={`w-full text-left p-4 rounded-lg transition-all duration-200 group ${
                         selectedCandidate?.candidate_id === candidate.candidate_id
                           ? 'bg-blue-50 border-2 border-blue-200 shadow-sm'
-                          : 'hover:bg-gray-50 border-2 border-transparent'
+                          : 'border-2 border-transparent'
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -654,55 +843,80 @@ const uniqueStatuses = React.useMemo(() => {
                         </p>
                       </div>
                     </div>
-
-                   {/* Right side: status + buttons */}
-<div className="flex flex-wrap items-center justify-start sm:justify-end gap-2">
-
-  {/* Status pill */}
+                      {/* Status Pill */}
   <span
-    className={`inline-flex items-center px-3 py-1 rounded-full text-xs sm:text-sm font-medium border ${getStatusColor(selectedCandidate.status)}`}
+    className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-semibold border shadow-sm ${getStatusColor(selectedCandidate.status)}`}
   >
     {selectedCandidate.status}
   </span>
 
-  {/* Move to For Interview */}
-  {selectedCandidate.status === 'CV Processed' && (
+{/* Premium Action Bar */}
+<div className="
+  flex flex-col sm:flex-row sm:items-center sm:space-x-4 
+  space-y-3 sm:space-y-0
+  bg-white/60 backdrop-blur-md 
+  px-4 py-3 rounded-xl 
+  border border-gray-200 shadow-sm
+">
+
+  {/* Preview CV */}
+  {selectedCandidate.cv_filename && (
     <button
-      onClick={handleMoveToForInterview}
-      disabled={saving}
-      className="flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-xs sm:text-sm"
+      onClick={() => setShowCvModal(true)}
+      className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm text-xs sm:text-sm font-medium"
     >
-      <Calendar className="h-4 w-4" />
-      <span>{saving ? 'Updating...' : 'Move to For Interview'}</span>
+      <Briefcase className="h-4 w-4 mr-2" />
+      Preview CV
     </button>
+
   )}
 
-  {/* Schedule button + vote */}
-  {selectedCandidate.vote !== null && selectedCandidate.vote !== undefined && (
-    <>
+  {/* Move to For Interview */}
+  {selectedCandidate.status === "CV Processed" && (
+        <button
+      onClick={handleMoveToForInterview}
+      disabled={saving}
+      className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-sm disabled:opacity-60 text-xs sm:text-sm font-medium"
+    >
+      <Calendar className="h-4 w-4 mr-2" />
+      {saving ? "Updating..." : "Move to Interview"}
+    </button>
 
-      {/* Schedule Interview */}
+  )}
+
+  {/* Schedule + Vote */}
+  {selectedCandidate.vote !== null && selectedCandidate.vote !== undefined && (
+    <div className="flex items-center space-x-3">
+
+      {/* Schedule */}
       <button
         onClick={handleScheduleInterview}
-        className="flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-xs sm:text-sm"
+        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg shadow-sm text-xs sm:text-sm font-medium"
       >
-        <Calendar className="h-4 w-4" />
-        <span>Schedule</span>
+        <Calendar className="h-4 w-4 mr-2" />
+        Schedule
       </button>
 
-      {/* Vote badge */}
-      <div className="flex items-center space-x-1 text-sm font-semibold text-gray-900">
+
+      {/* Vote */}
+      <span className="
+        inline-flex items-center space-x-1 px-3 py-1.5 
+        bg-yellow-50 border border-yellow-200 
+        text-yellow-700 font-semibold text-sm rounded-lg shadow-sm
+      ">
         <Award className="h-4 w-4 text-yellow-600" />
         <span>
-          {typeof selectedCandidate.vote === 'number'
+          {typeof selectedCandidate.vote === "number"
             ? selectedCandidate.vote.toFixed(1)
             : selectedCandidate.vote}
         </span>
-      </div>
+      </span>
 
-    </>
+    </div>
   )}
+
 </div>
+
 
                   </div>
 
@@ -710,6 +924,8 @@ const uniqueStatuses = React.useMemo(() => {
 
                 {/* Details Content */}
                 <div className="flex-1 overflow-y-auto p-6">
+                 
+
                   {/* Date Interviewed Display */}
                   {selectedCandidate.date_interviewed && (
                     <div className="mb-6">
@@ -728,6 +944,8 @@ const uniqueStatuses = React.useMemo(() => {
                   )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                   
+
                     
                     {/* Contact Information */}
                     <div className="space-y-6">
@@ -771,22 +989,21 @@ const uniqueStatuses = React.useMemo(() => {
 
                           {/* Phone */}
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                            <div className="p-3 border border-gray-200 rounded-lg bg-gray-50">
-                              <div className="text-sm text-gray-900">
-                                {selectedCandidate.mobile_num || 'Not provided'}
-                              </div>
-                            </div>
+                            <EditableField
+                                label="Phone Number"
+                                field="mobile_num"
+                                value={selectedCandidate.mobile_num}
+                              />
                           </div>
 
                           {/* Nationality */}
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
-                            <div className="p-3 border border-gray-200 rounded-lg bg-gray-50">
-                              <div className="text-sm text-gray-900">
-                                {selectedCandidate.nationality || 'Not specified'}
-                              </div>
-                            </div>
+                            <EditableField
+                                label="Nationality"
+                                field="nationality"
+                                value={selectedCandidate.nationality}
+                              />
+
                           </div>
                         </div>
                       </div>
@@ -802,34 +1019,121 @@ const uniqueStatuses = React.useMemo(() => {
                         <div className="space-y-4">
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Position Applied</label>
-                            <div className="p-3 border border-gray-200 rounded-lg bg-gray-50">
-                              <div className="text-sm text-gray-900">
-                                {selectedCandidate.position_code || 'Not specified'}
-                              </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Position Applied
+                              </label>
+
+                              {editingField === "position_code" ? (
+                                <div className="flex items-center space-x-2">
+                                  <select
+                                    value={editValue}
+                                    onChange={(e) => setEditValue(e.target.value)}
+                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    autoFocus
+                                  >
+                                    <option value="">Select Position</option>
+
+                                    {positions.map((p) => (
+                                      <option key={p.code} value={p.code}>
+                                        {p.name}
+                                      </option>
+                                    ))}
+                                  </select>
+
+                                  <button
+                                    onClick={saveEdit}
+                                    disabled={saving}
+                                    className="p-2 text-green-600 hover:bg-green-50 rounded"
+                                  >
+                                    <Save className="h-4 w-4" />
+                                  </button>
+
+                                  <button
+                                    onClick={cancelEdit}
+                                    className="p-2 text-red-600 hover:bg-red-50 rounded"
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div
+                                  onClick={() =>
+                                    startEdit("position_code", selectedCandidate.position_code)
+                                  }
+                                  className="group cursor-pointer hover:bg-gray-50 rounded-lg p-3 border border-gray-200 relative"
+                                >
+                                  <div className="text-sm text-gray-900">
+                                    {positions.find((p) => p.code === selectedCandidate.position_code)?.name ||
+                                      "Not specified"}
+                                  </div>
+
+                                  <Edit3 className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 absolute top-3 right-3" />
+                                </div>
+                              )}
                             </div>
+
+
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
-                            <div className="p-3 border border-gray-200 rounded-lg bg-gray-50">
-                              <div className="text-sm text-gray-900">
-                                {selectedCandidate.years_experience || 'Not specified'}
-                              </div>
-                            </div>
+                            <EditableField
+                                  label="Years of Experience"
+                                  field="years_experience"
+                                  value={selectedCandidate.years_experience}
+                                />
+
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">AI Evaluation Score</label>
-                            <div className="p-3 border border-gray-200 rounded-lg bg-gray-50">
-                              <div className="text-sm text-gray-900">
-                                {selectedCandidate.vote !== null && selectedCandidate.vote !== undefined 
-                                  ? `${typeof selectedCandidate.vote === 'number' ? selectedCandidate.vote.toFixed(1) : selectedCandidate.vote} / 10`
-                                  : 'Not evaluated'
-                                }
-                              </div>
-                            </div>
-                          </div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      AI Evaluation Score
+                    </label>
+
+                    {editingField === "vote" ? (
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          max="10"
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          autoFocus
+                        />
+                        <button
+                          onClick={saveEdit}
+                          disabled={saving}
+                          className="p-2 text-green-600 hover:bg-green-50 rounded"
+                        >
+                          <Save className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={cancelEdit}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div
+                        onClick={() => startEdit("vote", selectedCandidate.vote)}
+                        className="group cursor-pointer hover:bg-gray-50 rounded-lg p-3 border border-gray-200 relative"
+                      >
+                        <div className="text-sm text-gray-900">
+                          {selectedCandidate.vote !== null && selectedCandidate.vote !== undefined
+                            ? `${typeof selectedCandidate.vote === "number"
+                                ? selectedCandidate.vote.toFixed(1)
+                                : selectedCandidate.vote
+                              } / 10`
+                            : "Not evaluated"}
+                        </div>
+                        <Edit3 className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 absolute top-3 right-3" />
+                      </div>
+                    )}
+                  </div>
+
                         </div>
                       </div>
                     </div>
@@ -837,6 +1141,7 @@ const uniqueStatuses = React.useMemo(() => {
                 </div>
               </>
             ) : (
+              
               <div className="flex-1 flex items-center justify-center p-12">
                 <div className="text-center">
                   <User className="mx-auto h-16 w-16 text-gray-300 mb-4" />
@@ -849,6 +1154,7 @@ const uniqueStatuses = React.useMemo(() => {
             )}
           </div>
         </div>
+        
 
         {/* Appointment Form Modal */}
         <AppointmentForm
@@ -857,6 +1163,53 @@ const uniqueStatuses = React.useMemo(() => {
           onSuccess={handleAppointmentSuccess}
           selectedCandidate={selectedCandidate}
         />
+
+        {/* === CV MODAL === */}
+        {showCvModal && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white w-[90%] max-w-3xl rounded-xl shadow-2xl overflow-hidden animate-fadeIn relative">
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowCvModal(false)}
+                className="absolute top-3 right-3 text-gray-600 hover:text-gray-800"
+              >
+                <X className="h-6 w-6" />
+              </button>
+
+              {/* Header */}
+              <div className="p-5 border-b border-gray-200 flex items-center space-x-2">
+                <Briefcase className="h-5 w-5 text-blue-600" />
+                <h2 className="text-xl font-semibold text-gray-900">
+                  CV Preview – {getCandidateName(selectedCandidate!)}
+                </h2>
+              </div>
+
+              {/* CV Iframe */}
+              <div className="h-[550px]">
+                <iframe
+                  src={cvUrl || ""}
+                  className="w-full h-full"
+                  allow="autoplay"
+                />
+              </div>
+
+              {/* Footer */}
+              <div className="p-5 border-t bg-gray-50 flex justify-end">
+                <button
+                  onClick={() =>
+                    window.open(selectedCandidate!.cv_filename!, "_blank")
+                  }
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Download CV
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   )
