@@ -23,42 +23,27 @@ export default function Signup() {
     setError("")
     setSuccess("")
 
-    // 1️⃣ Create user in Auth
-    const { data, error: signupError } = await supabase.auth.signUp({
+    // 1️⃣ Create user in Supabase Auth with metadata
+    const { error: signupError } = await supabase.auth.signUp({
       email: form.company_email,
       password: form.password,
+      options: {
+        data: {
+          first_name: form.first_name.trim(),
+          last_name: form.last_name.trim(),
+          phone: form.phone.trim(),
+          company_name: form.company_name.trim(),
+        },
+      },
     })
+
 
     if (signupError) {
       setError(signupError.message)
       return
     }
 
-    const userId = data.user?.id
-
-    if (!userId) {
-      setError("Could not create user. Try again.")
-      return
-    }
-
-    // 2️⃣ Insert profile into hr_users table
-    const { error: profileError } = await supabase.from("hr_users").insert([
-      {
-        id: userId,
-        first_name: form.first_name,
-        last_name: form.last_name,
-        phone: form.phone,
-        company_email: form.company_email,
-        company_name: form.company_name,
-      },
-    ])
-
-    if (profileError) {
-      setError(profileError.message)
-      return
-    }
-
-    // 3️⃣ Success message
+    // 2️⃣ Success message only — profile is created AFTER first login
     setSuccess("Account created! Check your email inbox to verify your account.")
   }
 
