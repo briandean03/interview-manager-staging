@@ -48,6 +48,14 @@ const InterviewBooking: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+const [blockStart, setBlockStart] = useState("");
+const [blockEnd, setBlockEnd] = useState("");
+const [showBlockModal, setShowBlockModal] = useState(false);
+const [blockedDates, setBlockedDates] = useState<
+  { id: number; start_date: string; end_date: string | null }[]
+>([]);
+
+
 
   // selected date (state only!)
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -136,7 +144,19 @@ const InterviewBooking: React.FC = () => {
     } finally {
       setLoading(false)
     }
+
+    // Fetch blocked dates
+    const { data: blocked, error: blockedErr } = await supabase
+      .from("hrta_blocked_dates")
+      .select("*")
+      .order("start_date", { ascending: true });
+
+    if (blockedErr) throw blockedErr;
+    setBlockedDates(blocked || []);
+
   }
+
+  
 
   const handleNewAppointment = () => {
     setEditingAppointment(null)
@@ -209,6 +229,15 @@ if (!currentWeek) {
     )
   }
 
+  const isDateBlocked = (date: Date) => {
+  return blockedDates.some(b => {
+    const start = new Date(b.start_date);
+    const end = new Date(b.end_date);
+    return date >= start && date <= end;
+  });
+};
+
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -227,6 +256,13 @@ if (!currentWeek) {
                 <Plus className="h-4 w-4" />
                 <span>New Appointment</span>
               </button>
+              <button
+                  onClick={() => setShowBlockModal(true)}
+                  className="ml-3 flex items-center space-x-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  <Calendar className="h-4 w-4" />
+                  <span>Block Dates</span>
+                </button>
             </div>
           </div>
         </div>
@@ -369,18 +405,23 @@ if (!currentWeek) {
               {weekDays.map(day => (
                 <button
                   key={day.toString()}
-                    onClick={() => {
-                        setSelectedDate(day);
-                        navigate(`/booking?date=${format(day, "yyyy-MM-dd")}`);
-                      }}
-
+                   onClick={() => {
+                    if (isDateBlocked(day)) return;  // Prevent clicking
+                    setSelectedDate(day);
+                    navigate(`/booking?date=${format(day, "yyyy-MM-dd")}`);
+                  }}
                   className={`p-2 text-center rounded-lg border transition-colors duration-200 ${
-                    isSameDay(day, selectedDate)
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : day.getDay() === 0 || day.getDay() === 6
-                      ? 'bg-gray-100 text-gray-400 border-gray-200'
-                      : 'bg-white border-gray-200 hover:bg-blue-50 hover:border-blue-300'
-                  }`}
+                  isDateBlocked(day)
+                    ? "bg-red-100 border-red-300 text-red-700 cursor-not-allowed"
+                    : isSameDay(day, selectedDate)
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : day.getDay() === 0 || day.getDay() === 6
+                    ? "bg-gray-100 text-gray-400 border-gray-200"
+                    : "bg-white border-gray-200 hover:bg-blue-50 hover:border-blue-300"
+                }`}
+
+                
+
                 >
                   <div className="text-sm font-medium">{format(day, 'd')}</div>
                 </button>
@@ -402,43 +443,52 @@ if (!currentWeek) {
                       <div
                         key={`${day.toString()}-${time}`}
                         className={`min-h-[60px] border rounded-lg p-2 ${
-                          isWeekend 
-                            ? 'bg-gray-50 border-gray-200' 
-                            : 'bg-white border-gray-200 hover:bg-gray-50'
+                          isDateBlocked(day)
+                            ? "bg-red-50 border-red-200 text-red-500 cursor-not-allowed"
+                            : isWeekend
+                            ? "bg-gray-50 border-gray-200"
+                            : "bg-white border-gray-200 hover:bg-gray-50"
                         }`}
                       >
-                        <div className="space-y-1">
-                          {dayAppointments.slice(0, 3).map((appointment, index) => (
-                            <button
-                              key={appointment.id}
-                              onClick={() => setSelectedAppointment(appointment)}
-                              className={`w-full text-xs p-1 rounded text-left transition-colors duration-200 ${
-                                selectedAppointment?.id === appointment.id
-                                  ? 'bg-blue-600 text-white'
-                                  : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-                              }`}
-                            >
-                              <div className="truncate font-medium">
-                                {appointment.candidate ? 
-                                  `${appointment.candidate.first_name || ''} ${appointment.candidate.last_name || ''}`.trim() || 'Unknown'
-                                  : 'Unknown'
-                                }
+                        {/* If the entire day is blocked */}
+                        {isDateBlocked(day) ? (
+                          <div className="text-xs font-medium text-center">Blocked</div>
+                        ) : (
+                          <div className="space-y-1">
+                            {dayAppointments.slice(0, 3).map((appointment, index) => (
+                              <button
+                                key={appointment.id}
+                                onClick={() => setSelectedAppointment(appointment)}
+                                className={`w-full text-xs p-1 rounded text-left transition-colors duration-200 ${
+                                  selectedAppointment?.id === appointment.id
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                }`}
+                              >
+                                <div className="truncate font-medium">
+                                  {appointment.candidate
+                                    ? `${appointment.candidate.first_name || ""} ${
+                                        appointment.candidate.last_name || ""
+                                      }`
+                                    : "Unknown"}
+                                </div>
+                                <div className="truncate text-xs opacity-75">
+                                  {appointment.appointment_time
+                                    ? format(parseISO(appointment.appointment_time), "HH:mm")
+                                    : "No time"}
+                                </div>
+                              </button>
+                            ))}
+
+                            {dayAppointments.length > 3 && (
+                              <div className="text-xs text-gray-500 text-center">
+                                +{dayAppointments.length - 3} more
                               </div>
-                              <div className="truncate text-xs opacity-75">
-                                {appointment.appointment_time ? 
-                                  format(parseISO(appointment.appointment_time), 'HH:mm')
-                                  : 'No time'
-                                }
-                              </div>
-                            </button>
-                          ))}
-                          {dayAppointments.length > 3 && (
-                            <div className="text-xs text-gray-500 text-center">
-                              +{dayAppointments.length - 3} more
-                            </div>
-                          )}
-                        </div>
+                            )}
+                          </div>
+                        )}
                       </div>
+
                     )
                   })}
                 </div>
@@ -458,8 +508,71 @@ if (!currentWeek) {
         onSuccess={handleFormSuccess}
         existingAppointment={editingAppointment}
       />
+{/* Block Dates Modal */}
+{showBlockModal && (
+  <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+      <h2 className="text-xl font-semibold mb-4">Block Dates</h2>
+
+      <div className="space-y-4">
+        <div>
+          <label className="text-sm font-medium text-gray-700">Start Date</label>
+          <input
+            type="date"
+            className="w-full border rounded px-3 py-2"
+            onChange={e => setBlockStart(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-gray-700">End Date</label>
+          <input
+            type="date"
+            className="w-full border rounded px-3 py-2"
+            onChange={e => setBlockEnd(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-end space-x-2 mt-6">
+        <button
+          onClick={() => setShowBlockModal(false)}
+          className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={async () => {
+            if (!blockStart || !blockEnd) {
+              alert("Please choose start and end dates");
+              return;
+            }
+
+            const { error } = await supabase.from("hrta_blocked_dates").insert({
+              start_date: blockStart,
+              end_date: blockEnd,
+            });
+
+            if (error) alert(error.message);
+            else {
+              fetchData();
+              setShowBlockModal(false);
+            }
+          }}
+          className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
+        >
+          Block Dates
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+      
     </div>
   )
+
+  
 }
 
 export default InterviewBooking
