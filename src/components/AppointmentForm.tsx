@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { Calendar, Clock, User, MapPin, Phone, Mail, Save, X, CircleAlert as AlertCircle, CircleCheck as CheckCircle } from 'lucide-react'
 import { format, addDays, startOfDay, parseISO } from 'date-fns'
+import AnimatedModal from "../components/AnimatedModal"
 
 interface Candidate {
   candidate_id: string
@@ -223,6 +224,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
   if (!isOpen) return null
 
   return (
+    <AnimatedModal isOpen={isOpen} onClose={onClose}>
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
@@ -441,6 +443,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
         </form>
       </div>
     </div>
+    </AnimatedModal>
   )
 }
 
