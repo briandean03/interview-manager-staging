@@ -588,7 +588,6 @@ const uniqueStatuses = React.useMemo(() => {
           </div>
 
           {/* Search and Filters */}
-          <HoverCard>
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="relative">
@@ -650,8 +649,8 @@ const uniqueStatuses = React.useMemo(() => {
             </select>
             <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
-          </HoverCard>
-          </div>
+        
+
           
 
           {/* Active Filters — Linear Style */}
