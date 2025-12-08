@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import {
   Users,
   Calendar,
@@ -23,16 +24,17 @@ const Navigation: React.FC = () => {
   ]
 
   return (
-    <nav className="
+    <nav
+      className="
       sticky top-0 z-50
       bg-white/80 backdrop-blur-lg
       shadow-sm border-b border-gray-200 
       w-full
-    ">
+    "
+    >
       <div className="max-w-screen-xl mx-auto w-full px-4 sm:px-6 lg:px-8">
         {/* Brand + Navigation */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-3 sm:py-4">
-          
           {/* Brand */}
           <div className="flex items-center gap-2 mb-2 sm:mb-0">
             <UserCheck className="h-7 w-7 text-blue-600" />
@@ -42,25 +44,44 @@ const Navigation: React.FC = () => {
           </div>
 
           {/* Nav Items */}
-          <div className="flex overflow-x-auto sm:overflow-visible no-scrollbar gap-3 sm:gap-5 md:gap-6 pb-1 sm:pb-0">
-            {navItems.map(({ path, icon: Icon, label }) => (
-              <Link
-                key={path}
-                to={path}
-                className={`
-                  flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium 
-                  transition-all duration-200 whitespace-nowrap
-                  ${
-                    location.pathname === path
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'text-gray-600 hover:text-blue-600 hover:bg-gray-100'
-                  }
-                `}
-              >
-                <Icon className="h-4 w-4 flex-shrink-0" />
-                <span className="hidden md:inline">{label}</span>
-              </Link>
-            ))}
+          <div className="relative flex overflow-x-auto sm:overflow-visible no-scrollbar gap-3 sm:gap-5 md:gap-6 pb-1 sm:pb-0">
+
+            {navItems.map(({ path, icon: Icon, label }) => {
+              const isActive = location.pathname === path
+
+              return (
+                <div key={path} className="relative">
+                  {/* 🔵 Animated Highlight */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="nav-highlight"
+                      className="absolute inset-0 bg-blue-600 text-white shadow-md rounded-lg"
+                      transition={{
+                        type: 'spring',
+                        stiffness: 350,
+                        damping: 30,
+                      }}
+                    />
+                  )}
+
+                  <Link
+                    to={path}
+                    className={`
+                      flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium 
+                      transition-all duration-200 whitespace-nowrap relative z-10
+                      ${
+                        isActive
+                          ? 'text-white'
+                          : 'text-gray-600 hover:text-blue-600 hover:bg-gray-100'
+                      }
+                    `}
+                  >
+                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    <span className="hidden md:inline">{label}</span>
+                  </Link>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>

@@ -3,6 +3,9 @@ import { getSupabaseClient, isSupabaseConfigured, resetSupabaseConnection } from
 import { Search, ListFilter as Filter, ChevronDown, Users, Save, X, CreditCard as Edit3, RefreshCw, User, Mail, Phone, MapPin, Calendar, Award, Briefcase, Globe, Car, Languages, GraduationCap, Clock, DollarSign, ChevronRight, Plus } from 'lucide-react'
 import AppointmentForm from '../components/AppointmentForm'
 import { Candidate } from "../lib/Candidate"
+import PageTransition from "../components/PageTransition"
+import HoverCard from '../components/HoverCard'
+
 
 
 const CandidateSelection: React.FC = () => {
@@ -570,6 +573,7 @@ const uniqueStatuses = React.useMemo(() => {
 
 
     return (
+      <PageTransition>
       <div className="min-h-screen bg-gray-50 overflow-x-hidden">
         <div className="mx-auto w-full max-w-screen-xl px-3 sm:px-5 md:px-8 py-4 sm:py-6">
 
@@ -584,6 +588,7 @@ const uniqueStatuses = React.useMemo(() => {
           </div>
 
           {/* Search and Filters */}
+          <HoverCard>
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="relative">
@@ -627,6 +632,7 @@ const uniqueStatuses = React.useMemo(() => {
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               </div>
             </div>
+            
 
             <div className="relative">
             <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -644,6 +650,9 @@ const uniqueStatuses = React.useMemo(() => {
             </select>
             <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
+          </HoverCard>
+          </div>
+          
 
           {/* Active Filters — Linear Style */}
             <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -1208,6 +1217,7 @@ const uniqueStatuses = React.useMemo(() => {
 
       </div>
     </div>
+    </PageTransition>
   )
 }
 

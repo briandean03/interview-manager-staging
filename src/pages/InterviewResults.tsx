@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { supabase, isSupabaseConfigured, getSupabaseClient, testSupabaseConnection, resetSupabaseConnection } from '../lib/supabase'
 import { FileText, User, Calendar, Award, TrendingUp, Star, ChevronRight, Search, Filter } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
+import PageTransition from "../components/PageTransition"
+
 
 interface Candidate {
   candidate_id: string
@@ -248,6 +250,7 @@ const InterviewResults: React.FC = () => {
   }
 
   return (
+    <PageTransition>
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
@@ -629,6 +632,7 @@ const InterviewResults: React.FC = () => {
         </div>
       </div>
     </div>
+    </PageTransition>
   )
 }
 

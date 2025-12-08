@@ -12,7 +12,10 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.86.2",
     "date-fns": "^4.1.0",
+    "framer": "^2.4.1",
+    "framer-motion": "^12.23.25",
     "lucide-react": "^0.542.0",
+    "motion": "^12.23.25",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.8.2"

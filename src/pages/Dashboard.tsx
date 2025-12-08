@@ -13,6 +13,9 @@ import CandidateSearchModal from '../components/CandidateSearchModal'
 import { Candidate } from "../lib/Candidate"
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import PageTransition from "../components/PageTransition"
+import HoverCard from '../components/HoverCard'
+
 
 
 
@@ -217,6 +220,7 @@ const fetchProgressSnapshot = async () => {
   }
 
   return (
+    <PageTransition>
     <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       {/* Compact, centered container */}
       <div className="mx-auto w-full max-w-screen-xl px-3 sm:px-5 md:px-8 py-4 sm:py-6">
@@ -230,6 +234,7 @@ const fetchProgressSnapshot = async () => {
         </header>
 
         {/* Stats Cards */}
+        
         <section className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5 mb-5 sm:mb-7">
           {statCards.map((card, i) => (
             <div
@@ -252,18 +257,22 @@ const fetchProgressSnapshot = async () => {
             </div>
           ))}
         </section>
-
-
+        
 
 
         {/* Quick Actions */}
-        <section className="mb-5 sm:mb-7">
+        
+          <section className="mb-5 sm:mb-7">
+          <HoverCard>
           <QuickActions
             onNewAppointment={handleNewAppointment}
             candidateCount={stats.totalCandidates}
             appointmentCount={stats.scheduledInterviews}
           />
+          </HoverCard>
         </section>
+        
+        
 
         {/* Search Button */}
         <section className="mb-5 sm:mb-7 flex justify-center sm:justify-start">
@@ -329,20 +338,24 @@ const fetchProgressSnapshot = async () => {
         <section className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Calendar */}
           <div className="lg:col-span-2 order-1">
+            
             <AppointmentCalendar
               selectedDate={selectedDate}
               onDateSelect={(date) => {
                 const localDate = format(date, "yyyy-MM-dd");
                 navigate(`/booking?date=${localDate}`);
               }}
-
             />
+            
           </div>
 
           {/* Recent Activity */}
           <aside className="order-2 lg:order-none space-y-4">
+            
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+              
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Recent Activity</h3>
+              <HoverCard>
               <div className="space-y-3">
                 {[
                   { color: 'bg-blue-500', title: 'New candidate application', time: '2 hours ago' },
@@ -358,6 +371,7 @@ const fetchProgressSnapshot = async () => {
                   </div>
                 ))}
               </div>
+              </HoverCard>
             </div>
           </aside>
         </section>
@@ -376,7 +390,9 @@ const fetchProgressSnapshot = async () => {
         />
       </div>
     </div>
+    </PageTransition>
   )
+
 }
 
 export default Dashboard

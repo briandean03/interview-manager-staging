@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Clock, CircleCheck as CheckCircle, CircleAlert as AlertCircle, Calendar, User, FileText } from 'lucide-react';
 import { supabase, isSupabaseConfigured, testSupabaseConnection, resetSupabaseConnection } from '../lib/supabase';
 import { format, parseISO, subDays, isAfter } from 'date-fns';
+import PageTransition from "../components/PageTransition"
+
 
 interface ExecutionLog {
   id: string;
@@ -218,6 +220,7 @@ const InterviewProgress: React.FC = () => {
   }
 
   return (
+    <PageTransition>
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
@@ -438,6 +441,7 @@ const InterviewProgress: React.FC = () => {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }
 

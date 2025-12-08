@@ -14,6 +14,8 @@ import {
 import AppointmentForm from '../components/AppointmentForm';
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import PageTransition from "../components/PageTransition"
+
 
 interface Candidate {
   candidate_id: string;
@@ -177,6 +179,7 @@ const InterviewBooking: React.FC = () => {
   const weekDays = getWeekDays(currentWeek);
 
   return (
+    <PageTransition>
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
 
@@ -460,6 +463,7 @@ const InterviewBooking: React.FC = () => {
       )}
 
     </div>
+    </PageTransition>
   );
 };
 
