@@ -5,6 +5,7 @@ import AppointmentForm from '../components/AppointmentForm'
 import { Candidate } from "../lib/Candidate"
 import PageTransition from "../components/PageTransition"
 import HoverCard from '../components/HoverCard'
+import { useSearchParams } from "react-router-dom";
 
 
 
@@ -27,6 +28,9 @@ const CandidateSelection: React.FC = () => {
   const [positions, setPositions] = useState<{ code: string; name: string }[]>([]);
   const [cvUrl, setCvUrl] = useState<string | null>(null);
   const [showCvModal, setShowCvModal] = useState(false);
+  const [searchParams] = useSearchParams();
+  const searchId = searchParams.get("search"); // candidate_id
+
 
   // Mapping for created filter labels
   const createdFilterLabels: Record<string, string> = {
@@ -171,31 +175,74 @@ To fix this:
       abortControllerRef.current = null
     }
   }, []) // Remove selectedCandidate dependency to prevent unnecessary re-renders
-
-  // Update ref when selectedCandidate changes
-  useEffect(() => {
-    selectedCandidateRef.current = selectedCandidate
-  }, [selectedCandidate])
-  
-  // Remove debug useEffect to prevent constant logging
-  useEffect(() => {
-    // Add a small delay to prevent blocking the initial render
-    const timer = setTimeout(() => {
-      // Only run once on mount
-      if (!hasInitializedRef.current) {
-        hasInitializedRef.current = true
-        fetchCandidates()
-      }
-    }, 100) // Small delay to let the UI render first
-    
-    // Cleanup function
-    return () => {
-      clearTimeout(timer)
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
-      }
+/** ---------------------------------------------
+ * 1) Initialize + Fetch candidates on first load
+ * --------------------------------------------- */
+useEffect(() => {
+  const timer = setTimeout(() => {
+    if (!hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      fetchCandidates();
     }
-  }, []) // Empty dependency array - runs only once
+  }, 100);
+
+  return () => {
+    clearTimeout(timer);
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+  };
+}, []);
+
+/** ---------------------------------------------------------
+ * 2) Keep selectedCandidateRef updated when state changes
+ * --------------------------------------------------------- */
+useEffect(() => {
+  selectedCandidateRef.current = selectedCandidate;
+}, [selectedCandidate]);
+
+/** ------------------------------------------------------------
+ * 3) If URL contains ?search=<id>, auto-select that candidate
+ * ------------------------------------------------------------ */
+useEffect(() => {
+  if (!searchId || candidates.length === 0) return;
+
+  const match = candidates.find(c => c.candidate_id === searchId);
+  if (match) {
+    setSelectedCandidate(match);
+    selectedCandidateRef.current = match;
+  }
+}, [searchId, candidates]);
+
+/** ------------------------------------------------------------
+ * 4) After selecting from URL, scroll candidate into view
+ * ------------------------------------------------------------ */
+useEffect(() => {
+  if (!searchId) return;
+
+  const el = document.getElementById(`cand-${searchId}`);
+  if (el) {
+    el.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  }
+}, [searchId, candidates]);
+
+/** ------------------------------------------------------------
+ * 5) Update CV preview when selectedCandidate changes
+ * ------------------------------------------------------------ */
+useEffect(() => {
+  if (selectedCandidate?.cv_filename) {
+    const previewUrl = getCvPreviewUrl(selectedCandidate.cv_filename);
+    setCvUrl(previewUrl);
+  } else {
+    setCvUrl(null);
+  }
+}, [selectedCandidate]);
+
+
+     // Empty dependency array - runs only once
 
   // Separate handlers for retry operations
   const handleRetry = useCallback(async () => {
@@ -781,6 +828,7 @@ const uniqueStatuses = React.useMemo(() => {
                   {filteredCandidates.map((candidate) => (
                     <button
                       key={candidate.candidate_id}
+                      id = {`cand-${candidate.candidate_id}`}
                       onClick={() => setSelectedCandidate(candidate)}
                       className={`w-full text-left p-4 rounded-lg transition-all duration-200 group ${
                         selectedCandidate?.candidate_id === candidate.candidate_id
