@@ -178,95 +178,103 @@ const InterviewBooking: React.FC = () => {
 
   const weekDays = getWeekDays(currentWeek);
 
-  return (
-    <PageTransition>
+ return (
+  <PageTransition>
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-10">
 
-        {/* HEADER */}
-        <div className="flex items-center mb-8 space-x-3">
-          <Calendar className="h-8 w-8 text-blue-600" />
+        {/* =====================
+            PAGE HEADER
+        ====================== */}
+        <header className="flex items-center gap-3 mb-10">
+          <Calendar className="h-7 w-7 text-blue-600" />
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Interview Booking</h1>
-            <p className="text-gray-600">Monitor scheduled interview appointments</p>
+            <h1 className="text-3xl font-semibold tracking-tight text-gray-900">
+              Interview Booking
+            </h1>
+            <p className="text-gray-600 text-sm">
+              Weekly scheduling interface for interviews
+            </p>
           </div>
 
-          <div className="ml-auto flex items-center space-x-3">
+          <div className="ml-auto flex gap-3">
             <button
               onClick={() => {
                 setEditingAppointment(null);
                 setShowAppointmentForm(true);
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center space-x-2"
+              className="px-4 py-2 bg-black text-white rounded-lg text-sm hover:bg-black/80 transition"
             >
-              <Plus className="h-4 w-4" />
-              <span>New Appointment</span>
+              + New Appointment
             </button>
 
             <button
               onClick={() => setShowBlockModal(true)}
-              className="px-4 py-2 bg-gray-200 rounded-lg text-gray-800"
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm hover:bg-gray-100 transition"
             >
               Block Dates
             </button>
           </div>
-        </div>
+        </header>
 
+        {/* =====================
+            GRID LAYOUT
+        ====================== */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* =====================
+              LEFT PANEL: DETAILS
+          ====================== */}
+          <aside className="bg-white border border-gray-200 rounded-xl p-6">
 
-          {/* DETAILS PANEL */}
-          <div className="bg-white p-6 rounded-lg shadow-sm">
             <h2 className="text-xl font-semibold mb-6">Appointment Details</h2>
 
             {!selectedAppointment ? (
-              <div className="text-center py-8 text-gray-500">
-                <Clock className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <div className="text-center py-16 text-gray-500">
+                <Clock className="h-10 w-10 mx-auto mb-4 text-gray-300" />
                 Select an appointment to view details
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h3 className="font-medium text-blue-900 mb-2">
+              <div className="space-y-6">
+
+                {/* Candidate Box */}
+                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <h3 className="font-medium text-gray-900 mb-2">
                     {selectedAppointment.candidate
                       ? `${selectedAppointment.candidate.first_name} ${selectedAppointment.candidate.last_name}`
                       : "Unknown Candidate"}
                   </h3>
 
-                  <div className="text-sm space-y-2 text-blue-800">
-                    <div className="flex items-center space-x-2">
-                      <Mail className="h-4 w-4" />
-                      <span>{selectedAppointment.candidate?.email || "Not provided"}</span>
+                  <div className="space-y-2 text-sm text-gray-700">
+                    <div className="flex gap-2 items-center">
+                      <Mail className="h-4 w-4 text-gray-400" />
+                      {selectedAppointment.candidate?.email || "No email"}
                     </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Phone className="h-4 w-4" />
-                      <span>{selectedAppointment.candidate?.mobile_num || "Not provided"}</span>
+                    <div className="flex gap-2 items-center">
+                      <Phone className="h-4 w-4 text-gray-400" />
+                      {selectedAppointment.candidate?.mobile_num || "No phone"}
                     </div>
-
-                    <div className="flex items-center space-x-2">
-                      <User className="h-4 w-4" />
-                      <span>{selectedAppointment.candidate?.position_code}</span>
+                    <div className="flex gap-2 items-center">
+                      <User className="h-4 w-4 text-gray-400" />
+                      {selectedAppointment.candidate?.position_code}
                     </div>
                   </div>
                 </div>
 
                 {/* Time */}
                 <div>
-                  <label className="text-sm font-medium">Appointment Time</label>
-                  <div className="flex items-center space-x-2 text-sm">
+                  <p className="text-sm font-medium text-gray-900 mb-1">Appointment Time</p>
+                  <div className="flex items-center gap-2 text-gray-700 text-sm">
                     <Clock className="h-4 w-4 text-gray-400" />
-                    <span>
-                      {format(parseISO(selectedAppointment.appointment_time), "MMM d, yyyy - HH:mm")}
-                    </span>
+                    {format(parseISO(selectedAppointment.appointment_time), "MMM d, yyyy — HH:mm")}
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex space-x-2 pt-4 border-t">
+                <div className="pt-4 border-t border-gray-200 flex gap-3">
                   <button
                     onClick={() => setShowAppointmentForm(true)}
-                    className="px-3 py-1 bg-blue-100 text-blue-700 rounded"
+                    className="px-3 py-1.5 bg-gray-100 text-gray-800 rounded-lg text-sm hover:bg-gray-200"
                   >
                     Edit
                   </button>
@@ -275,71 +283,77 @@ const InterviewBooking: React.FC = () => {
                     onClick={async () => {
                       if (!confirm("Delete appointment?")) return;
 
-                      await supabase.from("hrta_cd00-03_appointment_info")
+                      await supabase
+                        .from("hrta_cd00-03_appointment_info")
                         .delete()
                         .eq("id", selectedAppointment.id);
 
                       setSelectedAppointment(null);
                       fetchData();
                     }}
-                    className="px-3 py-1 bg-red-100 text-red-700 rounded"
+                    className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-sm hover:bg-red-200"
                   >
                     Delete
                   </button>
                 </div>
               </div>
             )}
-          </div>
+          </aside>
 
-
-          {/* CALENDAR */}
-          <div className="bg-white p-6 rounded-lg shadow-sm lg:col-span-2">
+          {/* =====================
+              RIGHT PANEL: CALENDAR
+          ====================== */}
+          <main className="lg:col-span-2 bg-white border border-gray-200 rounded-xl p-6">
 
             {/* Week Navigation */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-8">
               <h2 className="text-xl font-semibold">Weekly Schedule</h2>
 
-              <div className="flex items-center space-x-4">
-                <button onClick={() => setCurrentWeek(addDays(currentWeek!, -7))}>
+              <div className="flex items-center gap-4 text-sm text-gray-700">
+                <button
+                  onClick={() => setCurrentWeek(addDays(currentWeek!, -7))}
+                  className="hover:text-black"
+                >
                   <ChevronLeft className="h-5 w-5" />
                 </button>
 
-                <span className="text-sm">
-                  {format(weekDays[0], "MMM d")} - {format(weekDays[6], "MMM d, yyyy")}
-                </span>
+                {format(weekDays[0], "MMM d")} — {format(weekDays[6], "MMM d, yyyy")}
 
-                <button onClick={() => setCurrentWeek(addDays(currentWeek!, 7))}>
+                <button
+                  onClick={() => setCurrentWeek(addDays(currentWeek!, 7))}
+                  className="hover:text-black"
+                >
                   <ChevronRight className="h-5 w-5" />
                 </button>
               </div>
             </div>
 
-            {/* Header */}
-            <div className="grid grid-cols-8 mb-4">
-              <div className="text-center text-sm font-medium py-2">Time</div>
-              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(d => (
-                <div key={d} className="text-center text-sm font-medium py-2">
-                  {d}
-                </div>
+            {/* Days Header */}
+            <div className="grid grid-cols-8 text-sm font-medium text-gray-700 mb-2">
+              <div className="py-2 text-center">Time</div>
+              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
+                <div key={d} className="py-2 text-center">{d}</div>
               ))}
             </div>
 
-            {/* Days Row */}
-            <div className="grid grid-cols-8 gap-2 mb-4">
+            {/* Date Row */}
+            <div className="grid grid-cols-8 mb-6 gap-1">
               <div></div>
-              {weekDays.map(day => (
+              {weekDays.map((day) => (
                 <button
                   key={day.toString()}
                   onClick={() => {
-                    if (isDateBlocked(day)) return;
-                    setSelectedDate(day);
-                    navigate(`/booking?date=${format(day, "yyyy-MM-dd")}`);
+                    if (isDateBlocked(day)) return
+                    setSelectedDate(day)
+                    navigate(`/booking?date=${format(day, "yyyy-MM-dd")}`)
                   }}
-                  className={`p-2 rounded-lg border ${
-                    isSameDay(day, selectedDate)
+                  className={`
+                    py-2 text-sm rounded-lg border transition
+                    ${isSameDay(day, selectedDate)
                       ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-white"
-                  }`}
+                      : "bg-white border-gray-300 hover:bg-gray-100"
+                    }
+                  `}
                 >
                   {format(day, "d")}
                 </button>
@@ -348,62 +362,69 @@ const InterviewBooking: React.FC = () => {
 
             {/* Time Slots */}
             <div className="space-y-2">
-              {timeSlots.map(time => (
-                <div key={time} className="grid grid-cols-8 gap-2">
-                  <div className="flex items-center justify-center text-sm py-4">{time}</div>
+              {timeSlots.map((time) => (
+                <div key={time} className="grid grid-cols-8 gap-1">
 
-                  {weekDays.map(day => {
-                    const dayAppointments = getAppointmentsForTimeSlot(day, time);
+                  {/* Time Column */}
+                  <div className="text-center text-sm py-3 text-gray-700">{time}</div>
+
+                  {/* Days */}
+                  {weekDays.map((day) => {
+                    const slots = getAppointmentsForTimeSlot(day, time)
+
+                    const isBlocked = isDateBlocked(day)
 
                     return (
-                      <div key={`${day}-${time}`} className="border rounded-lg p-2 min-h-[60px]">
-
-                        {/* BLOCKED LOGIC: show only Blocked */}
-                        {isDateBlocked(day) ? (
-                          <div className="text-center text-sm font-medium">Blocked</div>
+                      <div
+                        key={`${day}-${time}`}
+                        className={`
+                          min-h-[60px] p-2 rounded-lg border 
+                          ${isBlocked ? 
+                            "bg-gray-100 border-gray-300 text-gray-500" :
+                            "bg-white border-gray-300 hover:bg-gray-50"
+                          }
+                        `}
+                      >
+                        {isBlocked ? (
+                          <div className="text-xs text-center mt-3">Blocked</div>
                         ) : (
                           <div className="space-y-1">
-                            {dayAppointments.slice(0, 3).map(appt => (
+                            {slots.slice(0, 3).map((appt) => (
                               <button
                                 key={appt.id}
                                 onClick={() => setSelectedAppointment(appt)}
-                                className={`w-full text-xs p-1 rounded ${
-                                  selectedAppointment?.id === appt.id
+                                className={`
+                                  w-full text-xs p-1 rounded-md text-left truncate
+                                  ${selectedAppointment?.id === appt.id
                                     ? "bg-blue-600 text-white"
                                     : "bg-blue-100 text-blue-800"
-                                }`}
+                                  }
+                                `}
                               >
-                                <div className="truncate">
-                                  {appt.candidate
-                                    ? `${appt.candidate.first_name} ${appt.candidate.last_name}`
-                                    : "Unknown"}
-                                </div>
-                                <div className="text-xs opacity-75">
-                                  {format(parseISO(appt.appointment_time), "HH:mm")}
-                                </div>
+                                {appt.candidate
+                                  ? `${appt.candidate.first_name} ${appt.candidate.last_name}`
+                                  : "Unknown"}
                               </button>
                             ))}
 
-                            {dayAppointments.length > 3 && (
+                            {slots.length > 3 && (
                               <div className="text-xs text-gray-500 text-center">
-                                +{dayAppointments.length - 3} more
+                                +{slots.length - 3} more
                               </div>
                             )}
                           </div>
                         )}
-
                       </div>
-                    );
+                    )
                   })}
                 </div>
               ))}
             </div>
-          </div>
-
+          </main>
         </div>
       </div>
 
-      {/* Appointment Form */}
+      {/* Appointment Form Modal */}
       <AppointmentForm
         isOpen={showAppointmentForm}
         onClose={() => {
@@ -414,57 +435,50 @@ const InterviewBooking: React.FC = () => {
         existingAppointment={editingAppointment}
       />
 
-      {/* Block Dates Modal */}
+      {/* Block Dates Modal (unchanged) */}
       {showBlockModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+          <div className="bg-white p-6 rounded-xl border border-gray-200 w-full max-w-md">
             <h2 className="text-xl font-semibold mb-4">Block Dates</h2>
 
             <div className="space-y-4">
-              <input
-                type="date"
-                className="w-full border rounded px-3 py-2"
-                onChange={e => setBlockStart(e.target.value)}
-              />
-              <input
-                type="date"
-                className="w-full border rounded px-3 py-2"
-                onChange={e => setBlockEnd(e.target.value)}
-              />
+              <input type="date" onChange={(e) => setBlockStart(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+              <input type="date" onChange={(e) => setBlockEnd(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
             </div>
 
-            <div className="flex justify-end mt-6 space-x-2">
+            <div className="flex justify-end gap-2 mt-6">
               <button
                 onClick={() => setShowBlockModal(false)}
-                className="px-4 py-2 bg-gray-200 rounded"
+                className="px-4 py-2 bg-gray-100 rounded-lg"
               >
                 Cancel
               </button>
 
               <button
                 onClick={async () => {
-                  if (!blockStart || !blockEnd) return alert("Select dates");
+                  if (!blockStart || !blockEnd) return alert("Select dates")
 
                   await supabase.from("hrta_blocked_dates").insert({
                     start_date: blockStart,
                     end_date: blockEnd
-                  });
+                  })
 
-                  setShowBlockModal(false);
-                  fetchData();
+                  setShowBlockModal(false)
+                  fetchData()
                 }}
-                className="px-4 py-2 bg-blue-600 text-white rounded"
+                className="px-4 py-2 bg-black text-white rounded-lg"
               >
-                Block Dates
+                Block
               </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
-    </PageTransition>
-  );
+  </PageTransition>
+)
 };
 
 export default InterviewBooking;

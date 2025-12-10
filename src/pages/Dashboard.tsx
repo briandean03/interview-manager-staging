@@ -522,163 +522,135 @@ const Dashboard: React.FC = () => {
     )
   }
 
-  return (
-    <PageTransition>
-      <div className="min-h-screen bg-gray-50 overflow-x-hidden">
-        <div className="mx-auto w-full max-w-screen-xl px-3 sm:px-5 md:px-8 py-4 sm:py-6">
-          {/* PAGE HEADER */}
-          <header className="mb-4 sm:mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard</h1>
-                <p className="text-sm sm:text-base text-gray-600">
-                  Overview of your interview management system
-                </p>
-              </div>
+ return (
+  <PageTransition>
+    <div className="min-h-screen bg-gray-50 flex justify-center">
+      <div className="w-full max-w-screen-xl px-6 py-10">
 
-              {/* Filters: Role, Month, Status */}
-              <div className="flex flex-wrap gap-2">
-                {/* Role Filter */}
-                <select
-                  value={roleFilter}
-                  onChange={(e) => setRoleFilter(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white shadow-sm"
-                >
-                  <option value="all">All Roles</option>
-                  {roleOptions.map((role) => (
-                    <option key={role} value={role}>
-                      {role}
-                    </option>
-                  ))}
-                </select>
+        {/* =========================
+            PAGE HEADER
+        ========================== */}
+        <header className="mb-12">
+          <h1 className="text-3xl font-semibold tracking-tight text-gray-900">
+            Dashboard
+          </h1>
+          <p className="text-gray-600 mt-1 text-sm">
+            Overview of your interview pipeline
+          </p>
 
-                {/* Month Filter */}
-                <select
-                  value={monthFilter}
-                  onChange={(e) => setMonthFilter(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white shadow-sm"
-                >
-                  <option value="all">All Months</option>
-                  {monthOptions.map((m) => (
-                    <option key={m.value} value={m.value}>
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
+          {/* FILTERS INLINE + MINIMAL */}
+          <div className="flex flex-wrap gap-3 mt-6">
+            <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}
+              className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm">
+              <option value="all">All Roles</option>
+              {roleOptions.map((r) => <option key={r}>{r}</option>)}
+            </select>
 
-                {/* Status Filter */}
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white shadow-sm"
-                >
-                  <option value="all">All Status</option>
-                  {statusOptions.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <select value={monthFilter} onChange={(e) => setMonthFilter(e.target.value)}
+              className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm">
+              <option value="all">All Months</option>
+              {monthOptions.map((m) => (
+                <option key={m.value} value={m.value}>{m.label}</option>
+              ))}
+            </select>
+
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 bg-white border border-gray-300 rounded-md text-sm">
+              <option value="all">All Status</option>
+              {statusOptions.map((s) => <option key={s}>{s}</option>)}
+            </select>
+          </div>
+        </header>
+
+        {/* =========================
+            KPI SECTION — NOT BOXES
+        ========================== */}
+        <section className="mb-14">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-y-10">
+            
+            <div>
+              <p className="text-sm text-gray-600">Total Candidates</p>
+              <p className="text-4xl font-semibold mt-1">{stats.totalCandidates}</p>
             </div>
-          </header>
 
-          {/* KPI CARDS */}
-          <section className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5 mb-5 sm:mb-7">
-            {statCards.map((card, i) => (
-              <div
-                key={i}
-                className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-5 flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-[11px] sm:text-sm font-medium text-gray-600">
-                      {card.title}
-                    </p>
-                    <p className="text-xl sm:text-3xl font-bold text-gray-900">
-                      {card.value}
-                    </p>
-                  </div>
-                  <div className={`${card.color} p-2 rounded-lg`}>
-                    <card.icon className="h-5 w-5 text-white" />
-                  </div>
-                </div>
-                <div className="mt-2 flex items-center text-[11px] sm:text-sm">
-                  <span className="font-medium text-green-600">{card.change}</span>
-                </div>
-              </div>
-            ))}
-          </section>
+            <div>
+              <p className="text-sm text-gray-600">Scheduled Interviews</p>
+              <p className="text-4xl font-semibold mt-1">{stats.scheduledInterviews}</p>
+            </div>
 
-          {/* QUICK ACTIONS ROW (3 compact cards via QuickActions) */}
-          <section className="mb-5 sm:mb-7">
-            <HoverCard>
-              <QuickActions
-                onNewAppointment={handleNewAppointment}
-                candidateCount={stats.totalCandidates}
-                appointmentCount={stats.scheduledInterviews}
-              />
-            </HoverCard>
-          </section>
+            <div>
+              <p className="text-sm text-gray-600">Completed Interviews</p>
+              <p className="text-4xl font-semibold mt-1">{stats.completedInterviews}</p>
+            </div>
 
-          {/* OVERVIEW ROW: Mini Graph + Snapshot */}
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
+            <div>
+              <p className="text-sm text-gray-600">Pending Evaluations</p>
+              <p className="text-4xl font-semibold mt-1">{stats.pendingEvaluations}</p>
+            </div>
 
-            {/* Mini Graph: Interviews per Month */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 lg:col-span-2">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">
-                Interviews per Month
-              </h3>
+          </div>
+        </section>
+
+        {/* =========================
+            QUICK ACTIONS — MINIMAL
+        ========================== */}
+        <section className="mb-14">
+          <div className="p-5 bg-white border border-gray-200 rounded-xl">
+            <QuickActions
+              onNewAppointment={handleNewAppointment}
+              candidateCount={stats.totalCandidates}
+              appointmentCount={stats.scheduledInterviews}
+            />
+          </div>
+        </section>
+
+        {/* =========================
+            TREND + SNAPSHOT
+        ========================== */}
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-14">
+
+          {/* Trend Graph */}
+          <div className="lg:col-span-2">
+            <h2 className="text-lg font-semibold mb-4">Interviews per Month</h2>
+
+            <div className="bg-white border border-gray-200 rounded-xl p-6 h-64 flex items-end gap-4">
               {interviewTrend.length === 0 ? (
-                <p className="text-sm text-gray-500">No upcoming interviews for the selected filters.</p>
+                <p className="text-gray-500 text-sm">No upcoming interviews</p>
               ) : (
-                <div className="flex items-end gap-3 h-40">
-                  {interviewTrend.map((point) => {
-                    const max = Math.max(...interviewTrend.map(p => p.count))
-                    const height = max > 0 ? (point.count / max) * 100 : 0
-                    return (
-                      <div key={point.key} className="flex flex-col items-center flex-1">
-                        <div
-                          className="w-full bg-blue-100 rounded-t-md"
-                          style={{ height: `${height || 4}%` }}
-                        >
-                          <div className="w-full h-full bg-blue-500 rounded-t-md" />
-                        </div>
-                        <span className="mt-1 text-[11px] text-gray-600">
-                          {point.monthLabel}
-                        </span>
-                        <span className="text-[11px] text-gray-800 font-medium">
-                          {point.count}
-                        </span>
-                      </div>
-                    )
-                  })}
-                </div>
+                interviewTrend.map((p) => {
+                  const max = Math.max(...interviewTrend.map((x) => x.count))
+                  const height = max ? (p.count / max) * 100 : 5
+
+                  return (
+                    <div key={p.key} className="flex flex-col items-center flex-1">
+                      <div className="w-full bg-blue-300 rounded-md"
+                        style={{ height: `${height}%` }} />
+                      <span className="text-xs text-gray-600 mt-2">{p.monthLabel}</span>
+                      <span className="text-xs font-semibold">{p.count}</span>
+                    </div>
+                  )
+                })
               )}
             </div>
+          </div>
 
-            {/* Interview Progress Snapshot */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
-                Interview Progress Snapshot
-              </h3>
+          {/* Snapshot */}
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Progress Snapshot</h2>
 
-              <div className="grid grid-cols-3 gap-4 mb-5">
+            <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-6">
+              <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <p className="text-sm text-gray-600">Active Candidates</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {progressSnapshot.activeCandidates}
-                  </p>
+                  <p className="text-sm text-gray-600">Active</p>
+                  <p className="text-3xl font-semibold">{progressSnapshot.activeCandidates}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Total Actions</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {progressSnapshot.totalActivities}
-                  </p>
+                  <p className="text-sm text-gray-600">Actions</p>
+                  <p className="text-3xl font-semibold">{progressSnapshot.totalActivities}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Latest Activity</p>
-                  <p className="text-sm font-medium text-gray-800">
+                  <p className="text-sm text-gray-600">Latest</p>
+                  <p className="text-sm font-medium text-gray-900">
                     {progressSnapshot.latestActivity
                       ? new Date(progressSnapshot.latestActivity).toLocaleString()
                       : "—"}
@@ -686,106 +658,87 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {progressSnapshot.topCandidates.map((c, i) => (
                   <div key={i} className="flex justify-between text-sm">
-                    <span className="font-medium text-gray-900 truncate">{c.name}</span>
-                    <span className="text-gray-500">
-                      {new Date(c.time).toLocaleString()}
-                    </span>
+                    <p className="font-medium text-gray-900 truncate">{c.name}</p>
+                    <p className="text-gray-600">{new Date(c.time).toLocaleString()}</p>
                   </div>
                 ))}
               </div>
-
-              <button
-                onClick={() => navigate("/progress")}
-                className="mt-4 text-blue-600 text-sm font-medium hover:underline"
-              >
-                View full monitor →
-              </button>
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* BOTTOM SECTION: Recent Activity + Calendar */}
-          <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-            {/* Recent Activity (left) */}
-            <aside className="space-y-4">
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">
-                  Recent Activity
-                </h3>
-                <HoverCard>
-                  <div className="space-y-3">
-                    {activityFeed.length === 0 && (
-                <p className="text-sm text-gray-500">No recent activity</p>
+        {/* =========================
+            ACTIVITY + CALENDAR
+        ========================== */}
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+          {/* Activity Feed */}
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
+
+            <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
+              {activityFeed.length === 0 && (
+                <p className="text-gray-500 text-sm">No recent activity</p>
               )}
 
-             {activityFeed.map((act, i) => (
-  <div
-    key={i}
-    onClick={() => handleActivityClick(act)}
-    className="flex items-start space-x-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md transition"
-  >
-    {/* Dot */}
-    <div
-      className={`w-2.5 h-2.5 rounded-full mt-1.5 
-        ${act.color} 
-        ${act.urgent ? "animate-pulse" : ""}`}
-    />
-
-    {/* Text block */}
-    <div className="flex flex-col">
-      <p className="text-sm font-medium text-gray-900">
-        {act.label}
-        {act.urgent && (
-          <span className="ml-2 text-[10px] font-semibold text-orange-600">
-            — SOON
-          </span>
-        )}
-      </p>
-
-      <p className="text-xs text-gray-500">
-        {act.time ? new Date(act.time).toLocaleString() : ""}
-      </p>
-    </div>
-  </div>
-))}
-
-
+              {activityFeed.map((ev, i) => (
+                <div key={i}
+                  onClick={() => handleActivityClick(ev)}
+                  className="flex gap-3 p-2 rounded-md hover:bg-gray-100 cursor-pointer">
+                  <div className={`w-2.5 h-2.5 rounded-full mt-2 ${ev.color}`} />
+                  <div>
+                    <p className="text-sm font-medium">
+                      {ev.label}
+                      {ev.urgent && (
+                        <span className="ml-2 text-xs text-orange-600">
+                          SOON
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {ev.time ? new Date(ev.time).toLocaleString() : ""}
+                    </p>
                   </div>
-                </HoverCard>
-              </div>
-            </aside>
+                </div>
+              ))}
+            </div>
+          </div>
 
-            {/* Calendar (right) */}
-            <div className="lg:col-span-2">
+          {/* Calendar */}
+          <div className="lg:col-span-2">
+            <h2 className="text-lg font-semibold mb-4">Calendar</h2>
+            <div className="bg-white border border-gray-200 rounded-xl p-4">
               <AppointmentCalendar
                 selectedDate={selectedDate}
                 onDateSelect={(date) => {
                   setSelectedDate(date)
-                  const localDate = format(date, "yyyy-MM-dd")
-                  navigate(`/booking?date=${localDate}`)
+                  navigate(`/booking?date=${format(date, "yyyy-MM-dd")}`)
                 }}
               />
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* Modals */}
-          <AppointmentForm
-            isOpen={showAppointmentForm}
-            onClose={() => setShowAppointmentForm(false)}
-            onSuccess={handleAppointmentSuccess}
-            className="w-full max-w-md mx-auto"
-          />
-          <CandidateSearchModal
-            isOpen={showCandidateSearch}
-            onClose={() => setShowCandidateSearch(false)}
-            className="w-full max-w-md mx-auto"
-          />
-        </div>
+        {/* Modals */}
+        <AppointmentForm
+          isOpen={showAppointmentForm}
+          onClose={() => setShowAppointmentForm(false)}
+          onSuccess={handleAppointmentSuccess}
+        />
+        <CandidateSearchModal
+          isOpen={showCandidateSearch}
+          onClose={() => setShowCandidateSearch(false)}
+        />
+
       </div>
-    </PageTransition>
-  )
+    </div>
+  </PageTransition>
+)
+
+
 }
 
 export default Dashboard

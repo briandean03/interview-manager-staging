@@ -619,653 +619,274 @@ const uniqueStatuses = React.useMemo(() => {
 );
 
 
-    return (
-      <PageTransition>
-      <div className="min-h-screen bg-gray-50 overflow-x-hidden">
-        <div className="mx-auto w-full max-w-screen-xl px-3 sm:px-5 md:px-8 py-4 sm:py-6">
+     // ...keep all your imports, state, hooks, helpers, EditableField, etc. as-is above
 
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center space-x-3 mb-6">
-            <Users className="h-8 w-8 text-blue-600" />
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Candidate Selection</h1>
-              <p className="text-gray-600">Browse and manage candidate applications</p>
-            </div>
-          </div>
+return (
+  <PageTransition>
+    <div className="h-screen flex bg-gray-50">
 
-          {/* Search and Filters */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search candidates..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              
-              <div className="relative">
-                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <select
-                  className="w-full pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <option value="all">All Statuses</option>
-                  {uniqueStatuses.map(status => (
-                    <option key={status} value={status}>{status}</option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              </div>
+      
 
-              <div className="relative">
-                <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <select
-                  className="w-full pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
-                  value={positionFilter}
-                  onChange={(e) => setPositionFilter(e.target.value)}
-                >
-                  <option value="all">All Positions</option>
-                  {positions.map(pos => (
-                    <option key={pos.code} value={pos.code}>{pos.name}</option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              </div>
-            </div>
-            
+      {/* LEFT SIDEBAR — CANDIDATE LIST */}
+      <aside className="w-[28%] border-r bg-white overflow-y-auto">
+        {/* SIDEBAR HEADER + FILTERS */}
+<div className="px-4 py-4 sticky top-0 bg-white border-b z-10 space-y-4">
 
-            <div className="relative">
-            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <select
-              className="w-full pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
-              value={createdFilter}
-              onChange={(e) => setCreatedFilter(e.target.value)}
-            >
-              <option value="all">All Dates</option>
-              <option value="today">Today</option>
-              <option value="7days">Last 7 Days</option>
-              <option value="30days">Last 30 Days</option>
-              <option value="thismonth">This Month</option>
-              <option value="lastmonth">Last Month</option>
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          </div>
-        
+  {/* Title */}
+  <div>
+    <h2 className="text-lg font-semibold">Candidates</h2>
+    <p className="text-sm text-gray-500">{filteredCandidates.length} total</p>
+  </div>
 
-          
+  {/* FILTER BAR */}
+  <div className="flex flex-col space-y-3">
 
-          {/* Active Filters — Linear Style */}
-            <div className="mt-4 flex flex-wrap items-center gap-2">
+    {/* SEARCH */}
+    <div className="relative">
+      <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+      <input
+        type="text"
+        placeholder="Search candidates…"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full px-9 py-2 text-sm border border-gray-300 rounded-lg bg-white
+                   hover:border-gray-400 focus:ring-1 focus:ring-black/20 focus:border-black/40"
+      />
+    </div>
 
-              {/* Helper function style */}
-              {searchTerm && (
-                <div className="
-                  flex items-center gap-2 px-3 py-1.5 
-                  rounded-xl border border-gray-300 bg-white shadow-sm
-                  text-xs font-medium text-gray-700
-                ">
-                  <span className="opacity-80">Search:</span>
-                  <span className="font-semibold text-gray-900">{searchTerm}</span>
+    {/* FILTER DROPDOWNS */}
+    <div className="grid grid-cols-2 gap-2">
 
-                  <button
-                    onClick={() => setSearchTerm('')}
-                    className="text-gray-400 hover:text-gray-600 transition"
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-
-              {statusFilter !== "all" && (
-                <div className="
-                  flex items-center gap-2 px-3 py-1.5 
-                  rounded-xl border border-gray-300 bg-white shadow-sm
-                  text-xs font-medium text-gray-700
-                ">
-                  <span className="opacity-80">Status:</span>
-                  <span className="font-semibold text-gray-900">{statusFilter}</span>
-
-                  <button
-                    onClick={() => setStatusFilter('all')}
-                    className="text-gray-400 hover:text-gray-600 transition"
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-
-              {positionFilter !== "all" && (
-                <div className="
-                  flex items-center gap-2 px-3 py-1.5 
-                  rounded-xl border border-gray-300 bg-white shadow-sm
-                  text-xs font-medium text-gray-700
-                ">
-                  <span className="opacity-80">Position:</span>
-                  <span className="font-semibold text-gray-900">
-                    {positions.find((p) => p.code === positionFilter)?.name || positionFilter}
-                  </span>
-
-
-                  <button
-                    onClick={() => setPositionFilter('all')}
-                    className="text-gray-400 hover:text-gray-600 transition"
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-
-              {createdFilter !== "all" && (
-                <div className="
-                  flex items-center gap-2 px-3 py-1.5 
-                  rounded-xl border border-gray-300 bg-white shadow-sm
-                  text-xs font-medium text-gray-700
-                ">
-                  <span className="opacity-80">Date:</span>
-                  <span className="font-semibold text-gray-900">
-                    {createdFilterLabels[createdFilter] || createdFilter}
-                  </span>
-
-
-                  <button
-                    onClick={() => setCreatedFilter('all')}
-                    className="text-gray-400 hover:text-gray-600 transition"
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-
-              {/* CLEAR ALL — Linear minimal button */}
-              {(searchTerm || statusFilter !== "all" || positionFilter !== "all" || createdFilter !== "all") && (
-                <button
-                  onClick={() => {
-                    setSearchTerm('');
-                    setStatusFilter('all');
-                    setPositionFilter('all');
-                    setCreatedFilter('all');
-                  }}
-                  className="
-                    ml-1 px-3 py-1.5 rounded-xl border border-transparent
-                    text-xs font-medium text-gray-500 hover:text-gray-700
-                    hover:bg-gray-100 transition
-                  "
-                >
-                  Clear All
-                </button>
-              )}
-
-            </div>
-
-
-            
-            <div className="mt-4">
-              <p className="text-gray-600">
-                Showing {filteredCandidates.length} of {candidates.length} candidates
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Two Panel Layout */}
-        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-6">
-          {/* Left Panel - Candidate Gallery */}
-          <div className="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col max-h-[75vh]">
-            <div className="p-4 border-b border-gray-200 flex-shrink-0">
-              <h3 className="text-lg font-semibold text-gray-900">Candidates</h3>
-              <p className="text-sm text-gray-500">{filteredCandidates.length} candidates</p>
-            </div>
-
-            <div className="flex-1 overflow-y-scroll scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-              {filteredCandidates.length > 0 ? (
-                <div className="p-2 space-y-1">
-                  {filteredCandidates.map((candidate) => (
-                    <button
-                      key={candidate.candidate_id}
-                      id = {`cand-${candidate.candidate_id}`}
-                      onClick={() => setSelectedCandidate(candidate)}
-                      className={`w-full text-left p-4 rounded-lg transition-all duration-200 group ${
-                        selectedCandidate?.candidate_id === candidate.candidate_id
-                          ? 'bg-blue-50 border-2 border-blue-200 shadow-sm'
-                          : 'border-2 border-transparent'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                            <User className="h-5 w-5 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">
-                              {getCandidateName(candidate)}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {candidate.position_code || 'No position'}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end space-y-1">
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(candidate.status)}`}>
-                            {candidate.status}
-                          </span>
-                          {candidate.vote !== null && candidate.vote !== undefined && (
-                            <span className="inline-flex items-center justify-center w-6 h-6 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold">
-                              {typeof candidate.vote === 'number' ? candidate.vote.toFixed(1) : candidate.vote}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="p-8 text-center">
-                  <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No candidates found</h3>
-                  <p className="text-gray-600">Try adjusting your search criteria or filters.</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right Panel - Candidate Details */}
-          <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col max-h-[75vh]">
-            {selectedCandidate ? (
-              <>
-                {/* Header */}
-                <div className="p-6 border-b border-gray-200 flex-shrink-0">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                    {/* Left side: candidate name */}
-                    <div className="flex items-center space-x-3 min-w-0">
-                      <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <User className="h-7 w-7 text-blue-600" />
-                      </div>
-                      <div className="min-w-0">
-                        <h2 className="text-lg sm:text-2xl font-bold text-gray-900 leading-tight line-clamp-2">
-                          {getCandidateName(selectedCandidate)}
-                        </h2>
-                        <p className="text-sm text-gray-600 truncate">
-                          {selectedCandidate.position_code || 'No position specified'}
-                        </p>
-                      </div>
-                    </div>
-                      {/* Status Pill */}
-  <span
-    className={`inline-flex items-center px-4 py-1.5 rounded-full text-xs font-semibold border shadow-sm ${getStatusColor(selectedCandidate.status)}`}
-  >
-    {selectedCandidate.status}
-  </span>
-
-{/* Premium Action Bar */}
-<div className="
-  flex flex-col sm:flex-row sm:items-center sm:space-x-4 
-  space-y-3 sm:space-y-0
-  bg-white/60 backdrop-blur-md 
-  px-4 py-3 rounded-xl 
-  border border-gray-200 shadow-sm
-">
-
-  {/* Preview CV */}
-  {selectedCandidate.cv_filename && (
-    <button
-      onClick={() => setShowCvModal(true)}
-      className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm text-xs sm:text-sm font-medium"
-    >
-      <Briefcase className="h-4 w-4 mr-2" />
-      Preview CV
-    </button>
-
-  )}
-
-  {/* Move to For Interview */}
-  {selectedCandidate.status === "CV Processed" && (
-        <button
-      onClick={handleMoveToForInterview}
-      disabled={saving}
-      className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-sm disabled:opacity-60 text-xs sm:text-sm font-medium"
-    >
-      <Calendar className="h-4 w-4 mr-2" />
-      {saving ? "Updating..." : "Move to Interview"}
-    </button>
-
-  )}
-
-  {/* Schedule + Vote */}
-  {selectedCandidate.vote !== null && selectedCandidate.vote !== undefined && (
-    <div className="flex items-center space-x-3">
-
-      {/* Schedule */}
-      <button
-        onClick={handleScheduleInterview}
-        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg shadow-sm text-xs sm:text-sm font-medium"
+      {/* STATUS FILTER */}
+      <select
+        value={statusFilter}
+        onChange={(e) => setStatusFilter(e.target.value)}
+        className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white
+                   hover:border-gray-400 focus:ring-1 focus:ring-black/20 focus:border-black/40"
       >
-        <Calendar className="h-4 w-4 mr-2" />
-        Schedule
-      </button>
+        <option value="all">All Status</option>
+        {uniqueStatuses.map((s) => (
+          <option key={s}>{s}</option>
+        ))}
+      </select>
 
+      {/* POSITION FILTER */}
+      <select
+        value={positionFilter}
+        onChange={(e) => setPositionFilter(e.target.value)}
+        className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white
+                   hover:border-gray-400 focus:ring-1 focus:ring-black/20 focus:border-black/40"
+      >
+        <option value="all">All Positions</option>
+        {positions.map((p) => (
+          <option key={p.code} value={p.code}>
+            {p.name}
+          </option>
+        ))}
+      </select>
 
-      {/* Vote */}
-      <span className="
-        inline-flex items-center space-x-1 px-3 py-1.5 
-        bg-yellow-50 border border-yellow-200 
-        text-yellow-700 font-semibold text-sm rounded-lg shadow-sm
-      ">
-        <Award className="h-4 w-4 text-yellow-600" />
-        <span>
-          {typeof selectedCandidate.vote === "number"
-            ? selectedCandidate.vote.toFixed(1)
-            : selectedCandidate.vote}
-        </span>
-      </span>
+      {/* DATE FILTER */}
+      <select
+        value={createdFilter}
+        onChange={(e) => setCreatedFilter(e.target.value)}
+        className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white col-span-2
+                   hover:border-gray-400 focus:ring-1 focus:ring-black/20 focus:border-black/40"
+      >
+        <option value="all">All Dates</option>
+        <option value="today">Today</option>
+        <option value="7days">Last 7 Days</option>
+        <option value="30days">Last 30 Days</option>
+        <option value="thismonth">This Month</option>
+        <option value="lastmonth">Last Month</option>
+      </select>
 
     </div>
-  )}
-
+  </div>
 </div>
 
+        <div className="px-4 py-4 sticky top-0 bg-white border-b z-10">
+          <h2 className="text-lg font-semibold">Candidates</h2>
+          <p className="text-sm text-gray-500">{filteredCandidates.length} total</p>
 
-                  </div>
-
-                </div>
-
-                {/* Details Content */}
-                <div className="flex-1 overflow-y-auto p-6">
-                 
-
-                  {/* Date Interviewed Display */}
-                  {selectedCandidate.date_interviewed && (
-                    <div className="mb-6">
-                      <div className="flex items-center space-x-2 text-sm text-gray-700 bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 inline-flex">
-                        <Clock className="h-4 w-4 text-blue-600" />
-                        <span className="font-medium">Interviewed on:</span>
-                        <span className="text-gray-900 font-semibold">
-                          {new Date(selectedCandidate.date_interviewed).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                          })}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                   
-
-                    
-                    {/* Contact Information */}
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                          <Mail className="h-5 w-5 text-blue-600" />
-                          <span>Contact Information</span>
-                        </h3>
-                        <div className="space-y-4">
-                          {/* Email */}
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                            {editingField === 'email' ? (
-                              <div className="flex items-center space-x-2">
-                                <input
-                                  type="email"
-                                  value={editValue}
-                                  onChange={(e) => setEditValue(e.target.value)}
-                                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                  autoFocus
-                                />
-                                <button onClick={saveEdit} disabled={saving} className="p-2 text-green-600 hover:bg-green-50 rounded">
-                                  <Save className="h-4 w-4" />
-                                </button>
-                                <button onClick={cancelEdit} className="p-2 text-red-600 hover:bg-red-50 rounded">
-                                  <X className="h-4 w-4" />
-                                </button>
-                              </div>
-                            ) : (
-                              <div 
-                                className="group cursor-pointer hover:bg-gray-50 rounded-lg p-3 border border-gray-200 relative"
-                                onClick={() => startEdit('email', selectedCandidate.email)}
-                              >
-                                <div className="text-sm text-gray-900">
-                                  {selectedCandidate.email || 'Not provided'}
-                                </div>
-                                <Edit3 className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 absolute top-3 right-3" />
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Phone */}
-                          <div>
-                            <EditableField
-                                label="Phone Number"
-                                field="mobile_num"
-                                value={selectedCandidate.mobile_num}
-                              />
-                          </div>
-
-                          {/* Nationality */}
-                          <div>
-                            <EditableField
-                                label="Nationality"
-                                field="nationality"
-                                value={selectedCandidate.nationality}
-                              />
-
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Professional Information */}
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                          <Briefcase className="h-5 w-5 text-blue-600" />
-                          <span>Professional Details</span>
-                        </h3>
-                        <div className="space-y-4">
-
-                          <div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Position Applied
-                              </label>
-
-                              {editingField === "position_code" ? (
-                                <div className="flex items-center space-x-2">
-                                  <select
-                                    value={editValue}
-                                    onChange={(e) => setEditValue(e.target.value)}
-                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    autoFocus
-                                  >
-                                    <option value="">Select Position</option>
-
-                                    {positions.map((p) => (
-                                      <option key={p.code} value={p.code}>
-                                        {p.name}
-                                      </option>
-                                    ))}
-                                  </select>
-
-                                  <button
-                                    onClick={saveEdit}
-                                    disabled={saving}
-                                    className="p-2 text-green-600 hover:bg-green-50 rounded"
-                                  >
-                                    <Save className="h-4 w-4" />
-                                  </button>
-
-                                  <button
-                                    onClick={cancelEdit}
-                                    className="p-2 text-red-600 hover:bg-red-50 rounded"
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </button>
-                                </div>
-                              ) : (
-                                <div
-                                  onClick={() =>
-                                    startEdit("position_code", selectedCandidate.position_code)
-                                  }
-                                  className="group cursor-pointer hover:bg-gray-50 rounded-lg p-3 border border-gray-200 relative"
-                                >
-                                  <div className="text-sm text-gray-900">
-                                    {positions.find((p) => p.code === selectedCandidate.position_code)?.name ||
-                                      "Not specified"}
-                                  </div>
-
-                                  <Edit3 className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 absolute top-3 right-3" />
-                                </div>
-                              )}
-                            </div>
-
-
-                          </div>
-
-                          <div>
-                            <EditableField
-                                  label="Years of Experience"
-                                  field="years_experience"
-                                  value={selectedCandidate.years_experience}
-                                />
-
-                          </div>
-
-                          <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      AI Evaluation Score
-                    </label>
-
-                    {editingField === "vote" ? (
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="number"
-                          step="0.1"
-                          min="0"
-                          max="10"
-                          value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          autoFocus
-                        />
-                        <button
-                          onClick={saveEdit}
-                          disabled={saving}
-                          className="p-2 text-green-600 hover:bg-green-50 rounded"
-                        >
-                          <Save className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={cancelEdit}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div
-                        onClick={() => startEdit("vote", selectedCandidate.vote)}
-                        className="group cursor-pointer hover:bg-gray-50 rounded-lg p-3 border border-gray-200 relative"
-                      >
-                        <div className="text-sm text-gray-900">
-                          {selectedCandidate.vote !== null && selectedCandidate.vote !== undefined
-                            ? `${typeof selectedCandidate.vote === "number"
-                                ? selectedCandidate.vote.toFixed(1)
-                                : selectedCandidate.vote
-                              } / 10`
-                            : "Not evaluated"}
-                        </div>
-                        <Edit3 className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 absolute top-3 right-3" />
-                      </div>
-                    )}
-                  </div>
-
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </>
-            ) : (
-              
-              <div className="flex-1 flex items-center justify-center p-12">
-                <div className="text-center">
-                  <User className="mx-auto h-16 w-16 text-gray-300 mb-4" />
-                  <h3 className="text-xl font-medium text-gray-900 mb-2">Select a Candidate</h3>
-                  <p className="text-gray-600 max-w-md mx-auto">
-                    Choose a candidate from the gallery on the left to view their detailed information.
-                  </p>
-                </div>
-              </div>
-            )}
+          {/* SEARCH */}
+          <div className="relative mt-3">
+            <Search className="absolute left-3 top-2 h-4 w-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-9 py-2 text-sm border rounded-lg focus:ring-1 focus:ring-black/30"
+            />
           </div>
         </div>
-        
 
-        {/* Appointment Form Modal */}
-        <AppointmentForm
-          isOpen={showAppointmentForm}
-          onClose={() => setShowAppointmentForm(false)}
-          onSuccess={handleAppointmentSuccess}
-          selectedCandidate={selectedCandidate}
-        />
+        <div className="px-2 py-3 space-y-1">
+          {filteredCandidates.map((candidate) => {
+            const isActive = selectedCandidate?.candidate_id === candidate.candidate_id;
 
-        {/* === CV MODAL === */}
-        {showCvModal && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white w-[90%] max-w-3xl rounded-xl shadow-2xl overflow-hidden animate-fadeIn relative">
-
-              {/* Close Button */}
-              <button
-                onClick={() => setShowCvModal(false)}
-                className="absolute top-3 right-3 text-gray-600 hover:text-gray-800"
+            return (
+              <div
+                key={candidate.candidate_id}
+                id={`cand-${candidate.candidate_id}`}
+                onClick={() => setSelectedCandidate(candidate)}
+                className={`p-3 rounded-md cursor-pointer transition
+                  ${isActive ? "bg-gray-100 border border-gray-300" : "hover:bg-gray-50"}`}
               >
-                <X className="h-6 w-6" />
-              </button>
+                <p className="font-medium truncate">{getCandidateName(candidate)}</p>
+                <p className="text-xs text-gray-500 truncate">{candidate.position_code}</p>
 
-              {/* Header */}
-              <div className="p-5 border-b border-gray-200 flex items-center space-x-2">
-                <Briefcase className="h-5 w-5 text-blue-600" />
-                <h2 className="text-xl font-semibold text-gray-900">
-                  CV Preview – {getCandidateName(selectedCandidate!)}
-                </h2>
+                {candidate.vote !== null && (
+                  <p className="text-xs text-gray-400">Score: {candidate.vote.toFixed(1)}</p>
+                )}
               </div>
+            );
+          })}
+        </div>
+      </aside>
 
-              {/* CV Iframe */}
-              <div className="h-[550px]">
-                <iframe
-                  src={cvUrl || ""}
-                  className="w-full h-full"
-                  allow="autoplay"
-                />
-              </div>
+      {/* RIGHT SIDE — DETAILS PANEL */}
+      <main className="flex-1 overflow-y-auto px-10 py-8">
 
-              {/* Footer */}
-              <div className="p-5 border-t bg-gray-50 flex justify-end">
-                <button
-                  onClick={() =>
-                    window.open(selectedCandidate!.cv_filename!, "_blank")
-                  }
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Download CV
-                </button>
-              </div>
-
+        {/* Empty state */}
+        {!selectedCandidate && (
+          <div className="h-full flex items-center justify-center text-gray-400">
+            <div className="text-center">
+              <User className="h-14 w-14 mx-auto mb-3 opacity-50" />
+              <p className="text-lg font-medium">Select a candidate</p>
+              <p className="text-sm">Choose someone from the list to view details</p>
             </div>
           </div>
         )}
 
-      </div>
+        {selectedCandidate && (
+          <>
+            {/* HEADER */}
+            <section className="mb-10 pb-6 border-b">
+              <h1 className="text-3xl font-semibold tracking-tight">
+                {getCandidateName(selectedCandidate)}
+              </h1>
+
+              <p className="text-gray-600 mt-1">
+                {selectedCandidate.position_code || "No position specified"}
+              </p>
+
+              <div className="mt-3 flex gap-3">
+
+                {/* Status Badge */}
+                <span className={`px-3 py-1 text-xs rounded-full border ${getStatusColor(selectedCandidate.status)}`}>
+                  {selectedCandidate.status}
+                </span>
+
+                {/* Preview CV */}
+                {selectedCandidate.cv_filename && (
+                  <button
+                    onClick={() => setShowCvModal(true)}
+                    className="text-sm px-4 py-2 bg-black text-white rounded-md hover:bg-black/80 transition"
+                  >
+                    Preview CV
+                  </button>
+                )}
+
+                {/* Move to Interview */}
+                {selectedCandidate.status === "CV Processed" && (
+                  <button
+                    onClick={handleMoveToForInterview}
+                    className="text-sm px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                  >
+                    Move to Interview
+                  </button>
+                )}
+              </div>
+            </section>
+
+            {/* CONTACT INFORMATION */}
+            <section className="mb-10">
+              <h2 className="text-lg font-semibold mb-4">Contact Information</h2>
+
+              <div className="space-y-4">
+                <EditableField
+                  label="Email"
+                  field="email"
+                  value={selectedCandidate.email}
+                />
+
+                <EditableField
+                  label="Phone Number"
+                  field="mobile_num"
+                  value={selectedCandidate.mobile_num}
+                />
+
+                <EditableField
+                  label="Nationality"
+                  field="nationality"
+                  value={selectedCandidate.nationality}
+                />
+              </div>
+            </section>
+
+            {/* PROFESSIONAL INFO */}
+            <section className="mb-10">
+              <h2 className="text-lg font-semibold mb-4">Professional Details</h2>
+
+              <div className="space-y-4">
+
+                <EditableField
+                  label="Position Applied"
+                  field="position_code"
+                  value={
+                    positions.find((p) => p.code === selectedCandidate.position_code)?.name ||
+                    selectedCandidate.position_code
+                  }
+                />
+
+                <EditableField
+                  label="Years of Experience"
+                  field="years_experience"
+                  value={selectedCandidate.years_experience}
+                />
+
+                <EditableField
+                  label="AI Score"
+                  field="vote"
+                  value={selectedCandidate.vote}
+                />
+              </div>
+            </section>
+          </>
+        )}
+      </main>
     </div>
-    </PageTransition>
-  )
+
+    {/* Appointment Form */}
+    <AppointmentForm
+      isOpen={showAppointmentForm}
+      onClose={() => setShowAppointmentForm(false)}
+      onSuccess={handleAppointmentSuccess}
+      selectedCandidate={selectedCandidate}
+    />
+
+    {/* CV Modal */}
+    {showCvModal && (
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+        <div className="bg-white rounded-xl w-[80%] max-w-3xl shadow-xl relative">
+          <button
+            className="absolute top-3 right-3 text-gray-600 hover:text-black"
+            onClick={() => setShowCvModal(false)}
+          >
+            <X className="h-6 w-6" />
+          </button>
+
+          <div className="p-5 border-b">
+            <h3 className="text-xl font-semibold">CV Preview</h3>
+          </div>
+
+          <iframe src={cvUrl || ""} className="w-full h-[550px]" />
+        </div>
+      </div>
+    )}
+  </PageTransition>
+);
 }
 
 export default CandidateSelection
