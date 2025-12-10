@@ -704,23 +704,6 @@ return (
   </div>
 </div>
 
-        <div className="px-4 py-4 sticky top-0 bg-white border-b z-10">
-          <h2 className="text-lg font-semibold">Candidates</h2>
-          <p className="text-sm text-gray-500">{filteredCandidates.length} total</p>
-
-          {/* SEARCH */}
-          <div className="relative mt-3">
-            <Search className="absolute left-3 top-2 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-9 py-2 text-sm border rounded-lg focus:ring-1 focus:ring-black/30"
-            />
-          </div>
-        </div>
-
         <div className="px-2 py-3 space-y-1">
           {filteredCandidates.map((candidate) => {
             const isActive = selectedCandidate?.candidate_id === candidate.candidate_id;
