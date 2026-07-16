@@ -44,8 +44,9 @@ export default function Signup() {
       return
     }
 
-    // 2️⃣ Success message only — profile is created AFTER first login
-    setSuccess("Account created! Check your email inbox to verify your account.")
+    // 2️⃣ Account created — redirect to login
+    setSuccess("Account created! You can now log in.")
+    setTimeout(() => { window.location.href = "/login" }, 2000)
   }
 
   return (

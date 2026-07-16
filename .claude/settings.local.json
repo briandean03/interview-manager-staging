@@ -4,7 +4,8 @@
       "Bash(find \"/c/Users/bd502/OneDrive/Desktop/Work Projects/Interview Manager/project-bolt-vitejs-vite-s6kbhesq \\(Interview Manager\\)/interview-manager/src\" -type f \\\\\\( -name \"*.ts\" -o -name \"*.tsx\" \\\\\\))",
       "Bash(find \"/c/Users/bd502/OneDrive/Desktop/Work Projects/Interview Manager/project-bolt-vitejs-vite-s6kbhesq \\(Interview Manager\\)/interview-manager\" -maxdepth 2 -name \".env*\" -o -name \"*.env\")",
       "Bash(ls -la \"/c/Users/bd502/OneDrive/Desktop/Work Projects/Interview Manager/project-bolt-vitejs-vite-s6kbhesq \\(Interview Manager\\)/interview-manager\")",
-      "Bash(find \"/c/Users/bd502/OneDrive/Desktop/Work Projects/Interview Manager/project-bolt-vitejs-vite-s6kbhesq \\(Interview Manager\\)/interview-manager/supabase\" -type f)"
+      "Bash(find \"/c/Users/bd502/OneDrive/Desktop/Work Projects/Interview Manager/project-bolt-vitejs-vite-s6kbhesq \\(Interview Manager\\)/interview-manager/supabase\" -type f)",
+      "Bash(git pull origin main --rebase)"
     ]
   }
 }
