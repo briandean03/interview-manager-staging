@@ -24,7 +24,7 @@ export default function Signup() {
     setSuccess("")
 
     // 1️⃣ Create user in Supabase Auth with metadata
-    const { error: signupError } = await supabase.auth.signUp({
+    const { data: signupData, error: signupError } = await supabase.auth.signUp({
       email: form.company_email,
       password: form.password,
       options: {
@@ -37,6 +37,7 @@ export default function Signup() {
       },
     })
 
+    console.log("Signup response:", { signupData, signupError })
 
     if (signupError) {
       setError(signupError.message)
